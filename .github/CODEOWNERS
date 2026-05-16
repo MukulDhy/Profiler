@@ -1,0 +1,23 @@
+# CODEOWNERS for Inflio Monorepo
+
+# Frontend code must be reviewed by Mukul
+
+/frontend/@MukulDhy
+
+# Backend code must be reviewed by Mukul
+
+/backend/@MukulDhy
+
+# Docs team reviews documentation changes
+
+/docs/ @docs-team
+
+# Any GitHub workflow/config changes must be approved by the DevOps team
+
+/.github/ @devops-team
+
+# Default fallback (if no match above) → Core maintainers team
+
+@Infoli-core
+
+# Addding the Name of the Nara , Pooja and Aarti

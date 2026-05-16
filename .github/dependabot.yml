@@ -1,0 +1,17 @@
+# version: 2
+# updates:
+#   - package-ecosystem: "npm"
+#     directory: "/backend"
+#     schedule:
+#       interval: "daily"
+#   - package-ecosystem: "npm"
+#     directory: "/frontend"
+#     schedule:
+#       interval: "daily"
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/" # Location of package.json
+    schedule:
+      interval: "weekly"

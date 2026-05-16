@@ -1,0 +1,5 @@
+[
+  {"name":"bug","color":"ff0000","description":"Something isn't working"},
+  {"name":"enhancement","color":"84b6eb","description":"New feature or request"},
+  {"name":"good first issue","color":"7057ff","description":"Friendly for newcomers"}
+]
