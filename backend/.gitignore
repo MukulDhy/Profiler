@@ -1,8 +1,22 @@
 .qodo
 node_modules
-node_modules
 frontend
-logs
 logs/
 logs*
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Vector Database
+faiss_store/
+.pytest_cache/
