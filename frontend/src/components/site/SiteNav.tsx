@@ -16,7 +16,7 @@ export function SiteNav() {
           <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
           <Link to="/dashboard" className="hover:text-foreground transition-colors">Demo</Link>
           <Link
-            to="/upload"
+            to="/get-started"
             className="px-4 py-1.5 bg-accent text-accent-foreground rounded-full hover:brightness-110 transition-all"
           >
             Get Started

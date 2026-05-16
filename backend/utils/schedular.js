@@ -1,9 +1,9 @@
 import cron from "node-cron";
 import mongoose from "mongoose";
-import { sendTeamNotification } from "../services/sendTeamEmail.service.js";
-import Inflioathon from "../models/Infliothon.model.js";
-import Team from "../models/team.model.js";
-import TeamMember from "../models/teamMember.model.js";
+//import { sendTeamNotification } from "../services/sendTeamEmail.service.js";
+// import Inflioathon from "../models/Infliothon.model.js";
+// import Team from "../models/team.model.js";
+// import TeamMember from "../models/teamMember.model.js";
 import User from "../models/user.model.js";
 import logger from "./logger.js";
 
@@ -403,19 +403,19 @@ const createTeamsForInflioathon = async (Inflioathon, io) => {
 
         const teammateNames = await Promise.all(teammates);
 
-        emailPromises.push(
-          sendTeamNotification({
-            email: user.email,
-            name: user.name,
-            InflioathonTitle: title,
-            teammates: teammateNames,
-            problemStatement: randomProblem,
-            teamName: teamName,
-          }).catch((emailError) => {
-            logger.error(`Failed to send email to ${user.email}:`, emailError);
-            return null;
-          })
-        );
+        // emailPromises.push(
+        //   sendTeamNotification({
+        //     email: user.email,
+        //     name: user.name,
+        //     InflioathonTitle: title,
+        //     teammates: teammateNames,
+        //     problemStatement: randomProblem,
+        //     teamName: teamName,
+        //   }).catch((emailError) => {
+        //     logger.error(`Failed to send email to ${user.email}:`, emailError);
+        //     return null;
+        //   })
+        // );
       }
     }
 
