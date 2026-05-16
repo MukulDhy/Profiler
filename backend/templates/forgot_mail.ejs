@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inflio | Password Reset</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fb;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #333333;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: #1e1e2f;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .header img {
+      width: 100px;
+      margin-bottom: 12px;
+    }
+
+    .header h1 {
+      color: #ffffff;
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .content {
+      padding: 32px 28px;
+    }
+
+    .content h2 {
+      color: #1e1e2f;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .content p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #4a4a4a;
+      margin-bottom: 18px;
+    }
+
+    .otp-box {
+      text-align: center;
+      background-color: #f1f3ff;
+      color: #1e1e2f;
+      font-weight: bold;
+      font-size: 28px;
+      letter-spacing: 6px;
+      border-radius: 8px;
+      padding: 14px 0;
+      margin: 24px 0;
+    }
+
+    .button {
+      display: inline-block;
+      background-color: #4f46e5;
+      color: #ffffff !important;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+    }
+
+    .footer {
+      background-color: #f3f4f6;
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #666666;
+    }
+
+    .footer a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <img src="https://res.cloudinary.com/dptebtmac/image/upload/v1762544019/logo_cfkaof.png" alt="Inflio Logo" />
+      <h1>Inflio Password Reset</h1>
+    </div>
+
+    <!-- Body -->
+    <div class="content">
+      <p>Hello <%= user.name %>,</p>
+      <p>
+        We received a request to reset your Inflio account password. Use the
+        verification code below to complete the process:
+      </p>
+
+      <div class="otp-box">
+        <%= otp %>
+      </div>
+
+      <p>
+        This code will expire in <strong>5 minutes</strong>. Please use it
+        promptly to reset your password.
+      </p>
+
+      <p style="margin-top: 28px">
+        If you didn’t request this, you can safely ignore this email— your
+        password will remain unchanged.
+      </p>
+
+      <p>Thanks,<br />The Inflio Support Team</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        Need help? Contact us at
+        <a href="mailto:Inflio.mate17@gmail.com">Inflio.mate17@gmail.com</a>
+      </p>
+      <p style="margin-top: 6px">
+        © <%= new Date().getFullYear() %> Inflio. All rights reserved.
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+{
+  "name": "Inflio-mate-server",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Backend API for Inflio mate server",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "api",
+    "healthcare",
+    "device"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
+    "colors": "^1.4.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^6.7.0",
+    "express-validator": "^7.0.1",
+    "google-auth-library": "^10.2.1",
+    "helmet": "^6.1.5",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.8.7",
+    "mongoose-sequence": "^6.0.1",
+    "morgan": "^1.10.0",
+    "mqtt": "^4.3.7",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^7.0.6",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.8.1",
+    "twilio": "^5.6.0",
+    "winston": "^3.8.2",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "mongodb-memory-server": "^8.12.2",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
+  }
+}

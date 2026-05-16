@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SabKuchWale Activation Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      /* Base */
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #f4ece3; /* Warm white background */
+        color: #3f250b; /* Brown text color */
+      }
+      a {
+        color: #ffffff; /* Brown link color */
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 15px;
+        text-align: center;
+        color: #ffffff; /* Brown header color */
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 24px;
+      }
+      table td {
+        vertical-align: top;
+      }
+      /* Email wrapper */
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      /* Email header */
+      .email-header {
+        background-color: #351a01; /* Brown header background */
+        padding: 24px;
+        color: #f4ece3; /* Warm white text color */
+      }
+      /* Email body */
+      .email-body {
+        padding: 24px;
+        background-color: #fff9ce; /* White body background */
+      }
+      /* Email footer */
+      .email-footer {
+        background-color: #351a01; /* Brown footer background */
+        padding: 24px;
+      }
+      /* Buttons */
+      .button {
+        display: inline-block;
+        background-color: #8b5a2b; /* Brown button background */
+        color: #f4ece3; /* Warm white button text color */
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+      }
+      .text-color{
+        color: #f4ece3; /* Warm white button text color */
+        
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <h1>Welcome to SabKuchWale Family</h1>
+      </div>
+      <div class="email-body">
+        <p>Hello <%= user.name %>,</p>
+        <p>
+          Thank you for registering as a Customer with SabKuchWale. To activate
+          your account, please use the following activation code:
+        </p>
+        <h2><%= activationCode %></h2>
+        <p>
+          Please enter this code on the activation page within the next 5
+          minutes.
+        </p>
+        <p>
+          If you did not register for a SabKuchWale account, please ignore this
+          email.
+        </p>
+      </div>
+      <div class="email-footer">
+        <p class="text-color">
+          If you have any questions, please don't hesitate to contact us at
+          <a href="mailto:sabkuchwallah@gmail.com">sabkuchwallah@gmail.com</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
