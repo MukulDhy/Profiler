@@ -11,13 +11,14 @@ import logger from "./utils/logger.js";
 import compression from "compression";
 import errorHandler from "./middlewares/error.js";
 import authRouter from "./routes/auth.routes.js";
+import resumeRouter from "./routes/resume.routes.js";
 // import webSocketService from "./services/websocket.service.js";
-// import InflioathonRouter from "./routes/Infliothon.routes.js";
+// import ProFillerathonRouter from "./routes/ProFillerthon.routes.js";
 
 // Required for __dirname in ES modules
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { startScheduler } from "./utils/schedular.js";
+// import { startScheduler } from "./utils/schedular.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import { configCloudinary } from "./utils/uploadImage.js";
@@ -53,6 +54,7 @@ app.get("/", (req, res) => {
 
 // Routes - Default Made for Authentication, can be removed if not needed
 app.use("/api/user", authRouter);
+app.use("/api/resume", resumeRouter);
 
 // 404 handler
 app.use((req, res, next) => {

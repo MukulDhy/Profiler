@@ -1,8 +1,8 @@
 {
-  "name": "Inflio-mate-server",
+  "name": "ProFiller-mate-server",
   "type": "module",
   "version": "1.0.0",
-  "description": "Backend API for Inflio mate server",
+  "description": "Backend API for ProFiller mate server",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

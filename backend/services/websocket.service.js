@@ -6,7 +6,7 @@ import User from "../models/user.model.js";
 import Team from "../models/team.model.js";
 import Message from "../models/Message.model.js";
 import Notification from "../models/Notification.model.js";
-import Inflioathon from "../models/Infliothon.model.js";
+import ProFillerathon from "../models/ProFillerthon.model.js";
 import mongoose from "mongoose";
 import { startScheduler } from "../utils/schedular.js";
 
@@ -14,11 +14,11 @@ class WebSocketService {
   constructor() {
     this.wss = null;
     this.clients = new Map();
-    this.userToInflioathon = new Map();
+    this.userToProFillerathon = new Map();
     this.heartbeatInterval = 30000;
     this.pingInterval = null;
     this.timerInterval = null;
-    this.activeInflioathons = new Set();
+    this.activeProFillerathons = new Set();
     this.rateLimitMap = new Map(); // MOVED: Rate limit map to constructor
     this.messageRateLimit = new Map(); // MOVED: Message rate limit to constructor
   }
@@ -134,10 +134,10 @@ class WebSocketService {
 
     this.addClient(userId, ws);
 
-    // Update user's last seen and get their current Inflioathon
+    // Update user's last seen and get their current ProFillerathon
     await this.updateUserLastSeen(userId);
-    if (user.currentInflioathonId) {
-      this.userToInflioathon.set(userId, user.currentInflioathonId.toString());
+    if (user.currentProFillerathonId) {
+      this.userToProFillerathon.set(userId, user.currentProFillerathonId.toString());
     }
 
     // Setup client heartbeat
@@ -192,8 +192,8 @@ class WebSocketService {
         case "notifications.markRead":
           await this.handleMarkNotificationsRead(userId, message);
           break;
-        case "Inflioathon.subscribe":
-          await this.handleInflioathonSubscribe(userId, message);
+        case "ProFillerathon.subscribe":
+          await this.handleProFillerathonSubscribe(userId, message);
           break;
         default:
           logger.debug(`Unhandled client message type: ${message.type}`);
@@ -223,7 +223,7 @@ class WebSocketService {
       }
 
       switch (message.type) {
-        case "ADMIN.Inflioathon.EVENT":
+        case "ADMIN.ProFillerathon.EVENT":
           await this.handleAdminEvent(userId, message);
           break;
         default:
@@ -246,10 +246,10 @@ class WebSocketService {
     await this.updateUserLastSeen(userId);
 
     // Broadcast presence update to team members
-    const InflioathonId = this.userToInflioathon.get(userId);
-    if (InflioathonId) {
+    const ProFillerathonId = this.userToProFillerathon.get(userId);
+    if (ProFillerathonId) {
       const team = await Team.findOne({
-        InflioathonId,
+        ProFillerathonId,
         teamMember: userId, // Fixed: directly query the array
       });
 
@@ -272,12 +272,12 @@ class WebSocketService {
     await this.updateUserLastSeen(userId);
 
     // Broadcast presence update to team members
-    const { currentInflioathonId } = await User.findById(userId).select(
-      "currentInflioathonId"
+    const { currentProFillerathonId } = await User.findById(userId).select(
+      "currentProFillerathonId"
     );
-    if (currentInflioathonId) {
+    if (currentProFillerathonId) {
       const team = await Team.findOne({
-        InflioathonId: currentInflioathonId,
+        ProFillerathonId: currentProFillerathonId,
         teamMember: userId, // Fixed: directly query the array
       });
 
@@ -424,47 +424,47 @@ class WebSocketService {
     try {
       let payload = JSON.parse(message.payload);
       console.log("Admin event received:", payload);
-      const { InflioathonId, eventDetails } = payload;
-      // Inflio : MIGHT BE THE WRITE THE CHECKS FOR THE AHNADLIGN USER AND ADMIN CURRENT InflioTHON ONLY SEN DOT THOSE WHO HAVE ENTERED INTO THE InflioAHTON
+      const { ProFillerathonId, eventDetails } = payload;
+      // ProFiller : MIGHT BE THE WRITE THE CHECKS FOR THE AHNADLIGN USER AND ADMIN CURRENT ProFillerTHON ONLY SEN DOT THOSE WHO HAVE ENTERED INTO THE ProFillerAHTON
       this.broadcastToUsers(Array.from(this.clients.keys()), {
-        type: "ADMIN.Inflioathon.EVENT",
-        InflioathonId,
+        type: "ADMIN.ProFillerathon.EVENT",
+        ProFillerathonId,
         eventDetails,
       });
-      // if (user.currentInflioathonId?.toString() === InflioathonId) {
-      //   this.userToInflioathon.set(userId, InflioathonId);
-      //   this.activeInflioathons.add(InflioathonId);
+      // if (user.currentProFillerathonId?.toString() === ProFillerathonId) {
+      //   this.userToProFillerathon.set(userId, ProFillerathonId);
+      //   this.activeProFillerathons.add(ProFillerathonId);
 
       // this.sendToUser(userId, {
-      //   type: "Inflioathon.subscribed",
-      //   InflioathonId,
+      //   type: "ProFillerathon.subscribed",
+      //   ProFillerathonId,
       // });
       // this.broadcastToUsers(Array.from(this.clients.keys()), {
-      //   type: "ADMIN.Inflioathon.EVENT",
-      //   InflioathonId,
+      //   type: "ADMIN.ProFillerathon.EVENT",
+      //   ProFillerathonId,
       //   eventDetails,
       // });
     } catch (err) {
-      logger.error(`Inflioathon subscribe error: ${err.message}`);
+      logger.error(`ProFillerathon subscribe error: ${err.message}`);
     }
   }
-  async handleInflioathonSubscribe(userId, message) {
+  async handleProFillerathonSubscribe(userId, message) {
     try {
-      const { InflioathonId } = message;
+      const { ProFillerathonId } = message;
 
-      // Verify user is registered for this Inflioathon
+      // Verify user is registered for this ProFillerathon
       const user = await User.findById(userId);
-      if (user.currentInflioathonId?.toString() === InflioathonId) {
-        this.userToInflioathon.set(userId, InflioathonId);
-        this.activeInflioathons.add(InflioathonId);
+      if (user.currentProFillerathonId?.toString() === ProFillerathonId) {
+        this.userToProFillerathon.set(userId, ProFillerathonId);
+        this.activeProFillerathons.add(ProFillerathonId);
 
         this.sendToUser(userId, {
-          type: "Inflioathon.subscribed",
-          InflioathonId,
+          type: "ProFillerathon.subscribed",
+          ProFillerathonId,
         });
       }
     } catch (err) {
-      logger.error(`Inflioathon subscribe error: ${err.message}`);
+      logger.error(`ProFillerathon subscribe error: ${err.message}`);
     }
   }
 
@@ -535,47 +535,47 @@ class WebSocketService {
   }
 
   startTimerBroadcast() {
-    // Broadcast Inflioathon timers every 5 seconds
+    // Broadcast ProFillerathon timers every 5 seconds
     this.timerInterval = setInterval(async () => {
       try {
-        await this.broadcastInflioathonTimers();
+        await this.broadcastProFillerathonTimers();
       } catch (err) {
         logger.error(`Timer broadcast error: ${err.message}`);
       }
     }, 5000);
   }
 
-  async broadcastInflioathonTimers() {
+  async broadcastProFillerathonTimers() {
     const now = new Date();
 
-    // Get all running Inflioathons
-    const runningInflioathons = await Inflioathon.find({
+    // Get all running ProFillerathons
+    const runningProFillerathons = await ProFillerathon.find({
       status: { $in: ["scheduled", "running"] },
       endAt: { $gt: now },
     });
 
-    for (const Inflioathon of runningInflioathons) {
-      const InflioathonId = Inflioathon._id.toString();
-      this.activeInflioathons.add(InflioathonId);
+    for (const ProFillerathon of runningProFillerathons) {
+      const ProFillerathonId = ProFillerathon._id.toString();
+      this.activeProFillerathons.add(ProFillerathonId);
 
-      const remainingMs = Inflioathon.endAt.getTime() - now.getTime();
-      const hasStarted = Inflioathon.startAt <= now;
+      const remainingMs = ProFillerathon.endAt.getTime() - now.getTime();
+      const hasStarted = ProFillerathon.startAt <= now;
 
-      // Get all users in this Inflioathon
-      const usersInInflioathon = Array.from(this.userToInflioathon.entries())
-        .filter(([userId, userInflioathonId]) => userInflioathonId === InflioathonId)
+      // Get all users in this ProFillerathon
+      const usersInProFillerathon = Array.from(this.userToProFillerathon.entries())
+        .filter(([userId, userProFillerathonId]) => userProFillerathonId === ProFillerathonId)
         .map(([userId]) => userId);
 
-      if (usersInInflioathon.length > 0) {
-        this.broadcastToUsers(usersInInflioathon, {
-          type: "Inflioathon.timer",
-          InflioathonId,
+      if (usersInProFillerathon.length > 0) {
+        this.broadcastToUsers(usersInProFillerathon, {
+          type: "ProFillerathon.timer",
+          ProFillerathonId,
           now: now.getTime(),
-          startAt: Inflioathon.startAt.getTime(),
-          endAt: Inflioathon.endAt.getTime(),
+          startAt: ProFillerathon.startAt.getTime(),
+          endAt: ProFillerathon.endAt.getTime(),
           remainingMs,
           hasStarted,
-          status: Inflioathon.status,
+          status: ProFillerathon.status,
         });
       }
     }
@@ -648,7 +648,7 @@ class WebSocketService {
   removeClient(userId) {
     this.handleDisconnect(userId);
     if (this.clients.delete(userId)) {
-      this.userToInflioathon.delete(userId);
+      this.userToProFillerathon.delete(userId);
       logger.info(
         `Client ${userId} disconnected (${this.clients.size} remaining)`
       );
@@ -670,7 +670,7 @@ class WebSocketService {
       this.broadcastToUsers(memberIds, {
         type: "team.created",
         teamId: team._id,
-        InflioathonId: team.InflioathonId,
+        ProFillerathonId: team.ProFillerathonId,
         members: team.members.map((m) => ({
           userId: m.userId._id,
           name: m.userId.name,
@@ -714,41 +714,41 @@ class WebSocketService {
     }
   }
 
-  async notifyInflioathonStarted(InflioathonId) {
+  async notifyProFillerathonStarted(ProFillerathonId) {
     try {
-      const usersInInflioathon = Array.from(this.userToInflioathon.entries())
-        .filter(([userId, userInflioathonId]) => userInflioathonId === InflioathonId)
+      const usersInProFillerathon = Array.from(this.userToProFillerathon.entries())
+        .filter(([userId, userProFillerathonId]) => userProFillerathonId === ProFillerathonId)
         .map(([userId]) => userId);
 
-      this.broadcastToUsers(usersInInflioathon, {
-        type: "Inflioathon.started",
-        InflioathonId,
+      this.broadcastToUsers(usersInProFillerathon, {
+        type: "ProFillerathon.started",
+        ProFillerathonId,
         timestamp: Date.now(),
       });
 
-      this.activeInflioathons.add(InflioathonId);
-      logger.info(`Notified Inflioathon started: ${InflioathonId}`);
+      this.activeProFillerathons.add(ProFillerathonId);
+      logger.info(`Notified ProFillerathon started: ${ProFillerathonId}`);
     } catch (err) {
-      logger.error(`Notify Inflioathon started error: ${err.message}`);
+      logger.error(`Notify ProFillerathon started error: ${err.message}`);
     }
   }
 
-  async notifyInflioathonEnded(InflioathonId) {
+  async notifyProFillerathonEnded(ProFillerathonId) {
     try {
-      const usersInInflioathon = Array.from(this.userToInflioathon.entries())
-        .filter(([userId, userInflioathonId]) => userInflioathonId === InflioathonId)
+      const usersInProFillerathon = Array.from(this.userToProFillerathon.entries())
+        .filter(([userId, userProFillerathonId]) => userProFillerathonId === ProFillerathonId)
         .map(([userId]) => userId);
 
-      this.broadcastToUsers(usersInInflioathon, {
-        type: "Inflioathon.ended",
-        InflioathonId,
+      this.broadcastToUsers(usersInProFillerathon, {
+        type: "ProFillerathon.ended",
+        ProFillerathonId,
         timestamp: Date.now(),
       });
 
-      this.activeInflioathons.delete(InflioathonId);
-      logger.info(`Notified Inflioathon ended: ${InflioathonId}`);
+      this.activeProFillerathons.delete(ProFillerathonId);
+      logger.info(`Notified ProFillerathon ended: ${ProFillerathonId}`);
     } catch (err) {
-      logger.error(`Notify Inflioathon ended error: ${err.message}`);
+      logger.error(`Notify ProFillerathon ended error: ${err.message}`);
     }
   }
 
@@ -757,7 +757,7 @@ class WebSocketService {
       // Save to database
       const notificationDoc = new Notification({
         userId,
-        InflioathonId: notification.InflioathonId,
+        ProFillerathonId: notification.ProFillerathonId,
         type: notification.type,
         payload: notification.payload,
         read: false,
@@ -824,13 +824,13 @@ class WebSocketService {
     return false;
   }
 
-  // Update user's Inflioathon mapping when they join/leave
-  updateUserInflioathon(userId, InflioathonId) {
-    if (InflioathonId) {
-      this.userToInflioathon.set(userId, InflioathonId.toString());
-      this.activeInflioathons.add(InflioathonId.toString());
+  // Update user's ProFillerathon mapping when they join/leave
+  updateUserProFillerathon(userId, ProFillerathonId) {
+    if (ProFillerathonId) {
+      this.userToProFillerathon.set(userId, ProFillerathonId.toString());
+      this.activeProFillerathons.add(ProFillerathonId.toString());
     } else {
-      this.userToInflioathon.delete(userId);
+      this.userToProFillerathon.delete(userId);
     }
   }
 
@@ -847,19 +847,19 @@ class WebSocketService {
   getSystemStats() {
     return {
       connectedClients: this.clients.size,
-      activeInflioathons: this.activeInflioathons.size,
-      userInflioathonMappings: this.userToInflioathon.size,
+      activeProFillerathons: this.activeProFillerathons.size,
+      userProFillerathonMappings: this.userToProFillerathon.size,
       rateLimitEntries: this.messageRateLimit.size,
       uptime: process.uptime(),
       memoryUsage: process.memoryUsage(),
     };
   }
 
-  // Get users by Inflioathon (for admin purposes)
-  getUsersByInflioathon(InflioathonId) {
+  // Get users by ProFillerathon (for admin purposes)
+  getUsersByProFillerathon(ProFillerathonId) {
     const users = [];
-    this.userToInflioathon.forEach((userInflioathonId, userId) => {
-      if (userInflioathonId === InflioathonId && this.clients.has(userId)) {
+    this.userToProFillerathon.forEach((userProFillerathonId, userId) => {
+      if (userProFillerathonId === ProFillerathonId && this.clients.has(userId)) {
         users.push(userId);
       }
     });
@@ -917,8 +917,8 @@ class WebSocketService {
     });
 
     this.clients.clear();
-    this.userToInflioathon.clear();
-    this.activeInflioathons.clear();
+    this.userToProFillerathon.clear();
+    this.activeProFillerathons.clear();
     this.messageRateLimit.clear();
 
     logger.info("WebSocket service shut down");
