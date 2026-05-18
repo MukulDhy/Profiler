@@ -8,7 +8,7 @@ describe("Auth Controller", () => {
       const userData = {
         name: "Test User",
         email: "test@example.com",
-        password: "password123",
+        password: "Test@1234",
         userType: "patient",
       };
 
@@ -36,7 +36,7 @@ describe("Auth Controller", () => {
       await User.create({
         name: "Existing User",
         email: "existing@example.com",
-        password: "password123",
+        password: "Test@1234",
         userType: "patient",
       });
 
@@ -44,7 +44,7 @@ describe("Auth Controller", () => {
       const userData = {
         name: "New User",
         email: "existing@example.com",
-        password: "password123",
+        password: "Test@1234",
         userType: "caregiver",
       };
 
@@ -79,7 +79,7 @@ describe("Auth Controller", () => {
       await User.create({
         name: "Login Test",
         email: "login@example.com",
-        password: "password123",
+        password: "Test@1234",
         userType: "patient",
       });
     });
@@ -87,7 +87,7 @@ describe("Auth Controller", () => {
     it("should login with correct credentials", async () => {
       const loginData = {
         email: "login@example.com",
-        password: "password123",
+        password: "Test@1234",
       };
 
       const response = await request(app)
@@ -102,7 +102,7 @@ describe("Auth Controller", () => {
     it("should not login with incorrect password", async () => {
       const loginData = {
         email: "login@example.com",
-        password: "wrongpassword",
+        password: "wrongPassword@123",
       };
 
       const response = await request(app)
@@ -116,7 +116,7 @@ describe("Auth Controller", () => {
     it("should not login with non-existent email", async () => {
       const loginData = {
         email: "nonexistent@example.com",
-        password: "password123",
+        password: "Test@1234",
       };
 
       const response = await request(app)
