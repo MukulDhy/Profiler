@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import path from "path";
 import bodyParser from "body-parser";
@@ -29,17 +30,23 @@ const server = http.createServer(app);
 connectDB();
 configCloudinary();
 // Middleware
+app.use(cors({
+  origin: "http://localhost:8080", 
+  credentials: true,
+}));
+app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(bodyParser.json());
 
 app.use(helmet());
-app.use(cors());
+//app.use(cors());
 app.use(compression());
 app.use(morgan("combined", { stream: logger.stream }));
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
+
 
 // Routes
 app.get("/", (req, res) => {
@@ -52,7 +59,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes - Default Made for Authentication, can be removed if not needed
-app.use("/api/user", authRouter);
+app.use("/api/auth", authRouter);
 
 // 404 handler
 app.use((req, res, next) => {

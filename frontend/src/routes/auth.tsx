@@ -1,7 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Loader2, Lock, Mail, Sparkles, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  Sparkles,
+  User,
+  AlertCircle,
+} from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -16,7 +26,18 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-// ─── tiny helpers ───────────────────────────────────────────────────────────
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:5001/api";
+
+// ─── tiny helpers ─────────────────────────────────────────────────────────────
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+      <AlertCircle className="size-3.5 shrink-0" />
+      <span>{message}</span>
+    </div>
+  );
+}
 
 function InputField({
   id,
@@ -42,7 +63,10 @@ function InputField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+      <label
+        htmlFor={id}
+        className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground"
+      >
         {label}
       </label>
       <div className="relative group">
@@ -69,18 +93,45 @@ function InputField({
   );
 }
 
-// ─── login form ──────────────────────────────────────────────────────────────
+// ─── login form ───────────────────────────────────────────────────────────────
 
 function LoginForm({ onSwitch }: { onSwitch: () => void }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // sends/receives the httpOnly refresh cookie
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message ?? "Login failed. Please try again.");
+        return;
+      }
+
+      // Store access token in memory / sessionStorage (not localStorage — XSS risk)
+      sessionStorage.setItem("accessToken", data.accessToken);
+
+      // Redirect to dashboard (change to your actual post-login route)
+      navigate({ to: "/dashboard" });
+    } catch {
+      setError("Could not reach the server. Check your connection.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,6 +144,8 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
       onSubmit={handleSubmit}
       className="flex flex-col gap-5"
     >
+      {error && <ErrorBanner message={error} />}
+
       <InputField
         id="login-email"
         label="Email"
@@ -113,26 +166,29 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
       />
 
       <div className="flex justify-end">
-        <button type="button" className="text-[11px] font-mono text-accent hover:brightness-125 transition-all tracking-wider">
+        <button
+          type="button"
+          className="text-[11px] font-mono text-accent hover:brightness-125 transition-all tracking-wider"
+        >
           Forgot password?
         </button>
       </div>
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !email || !password}
         className="w-full py-3 bg-accent text-accent-foreground font-semibold rounded-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {loading ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          "Sign In"
-        )}
+        {loading ? <Loader2 className="size-4 animate-spin" /> : "Sign In"}
       </button>
 
       <p className="text-center text-xs text-muted-foreground">
         Don't have an account?{" "}
-        <button type="button" onClick={onSwitch} className="text-accent hover:brightness-125 transition font-medium">
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="text-accent hover:brightness-125 transition font-medium"
+        >
           Create one
         </button>
       </p>
@@ -140,19 +196,48 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
   );
 }
 
-// ─── signup form ─────────────────────────────────────────────────────────────
+// ─── signup form ──────────────────────────────────────────────────────────────
 
 function SignupForm({ onSwitch }: { onSwitch: () => void }) {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Show the first validation error if the server returned an array
+        const msg =
+          data.errors?.[0]?.message ?? data.message ?? "Registration failed.";
+        setError(msg);
+        return;
+      }
+
+      sessionStorage.setItem("accessToken", data.accessToken);
+
+      // Redirect after signup (change to your actual post-register route)
+      navigate({ to: "/dashboard" });
+    } catch {
+      setError("Could not reach the server. Check your connection.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -165,6 +250,8 @@ function SignupForm({ onSwitch }: { onSwitch: () => void }) {
       onSubmit={handleSubmit}
       className="flex flex-col gap-5"
     >
+      {error && <ErrorBanner message={error} />}
+
       <InputField
         id="signup-name"
         label="Full Name"
@@ -194,11 +281,17 @@ function SignupForm({ onSwitch }: { onSwitch: () => void }) {
 
       <p className="text-[10px] text-muted-foreground/60 leading-relaxed font-mono">
         By signing up you agree to our{" "}
-        <a href="#" className="text-accent/70 hover:text-accent transition-colors underline underline-offset-2">
+        <a
+          href="#"
+          className="text-accent/70 hover:text-accent transition-colors underline underline-offset-2"
+        >
           Terms
         </a>{" "}
         and{" "}
-        <a href="#" className="text-accent/70 hover:text-accent transition-colors underline underline-offset-2">
+        <a
+          href="#"
+          className="text-accent/70 hover:text-accent transition-colors underline underline-offset-2"
+        >
           Privacy Policy
         </a>
         .
@@ -206,19 +299,19 @@ function SignupForm({ onSwitch }: { onSwitch: () => void }) {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !name || !email || !password}
         className="w-full py-3 bg-accent text-accent-foreground font-semibold rounded-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        {loading ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          "Create Account"
-        )}
+        {loading ? <Loader2 className="size-4 animate-spin" /> : "Create Account"}
       </button>
 
       <p className="text-center text-xs text-muted-foreground">
         Already have an account?{" "}
-        <button type="button" onClick={onSwitch} className="text-accent hover:brightness-125 transition font-medium">
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="text-accent hover:brightness-125 transition font-medium"
+        >
           Sign in
         </button>
       </p>
@@ -226,7 +319,7 @@ function SignupForm({ onSwitch }: { onSwitch: () => void }) {
   );
 }
 
-// ─── main page ───────────────────────────────────────────────────────────────
+// ─── main page ────────────────────────────────────────────────────────────────
 
 function AuthPage() {
   const { tab } = Route.useSearch();
@@ -238,12 +331,13 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-accent/30 selection:text-white">
-
       {/* Background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 size-[700px] bg-accent/8 rounded-full animate-pulse-glow blur-3xl" />
-        <div className="absolute bottom-0 right-0 size-96 bg-accent/5 rounded-full animate-pulse-glow blur-3xl" style={{ animationDelay: "3s" }} />
-        {/* grid */}
+        <div
+          className="absolute bottom-0 right-0 size-96 bg-accent/5 rounded-full animate-pulse-glow blur-3xl"
+          style={{ animationDelay: "3s" }}
+        />
         <div
           className="absolute inset-0 opacity-[0.025]"
           style={{
@@ -256,7 +350,10 @@ function AuthPage() {
 
       {/* Top bar */}
       <header className="flex items-center justify-between px-6 py-5 max-w-7xl w-full mx-auto">
-        <Link to="/" className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+        <Link
+          to="/"
+          className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity"
+        >
           <div className="size-4 bg-foreground rounded-sm" />
           <span className="font-semibold tracking-tight text-sm uppercase">ProfileGPT</span>
         </Link>
@@ -294,27 +391,23 @@ function AuthPage() {
 
           {/* Panel */}
           <div className="bg-panel border border-border rounded-2xl overflow-hidden shadow-2xl">
-
             {/* Tab switcher */}
             <div className="relative flex border-b border-border bg-white/[0.02]">
-              {/* sliding indicator */}
               <motion.div
                 layout
                 layoutId="auth-tab-indicator"
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute bottom-0 h-0.5 bg-accent rounded-full"
-                style={{
-                  width: "50%",
-                  left: active === "login" ? "0%" : "50%",
-                }}
+                style={{ width: "50%", left: active === "login" ? "0%" : "50%" }}
               />
-
               {(["login", "signup"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   className={`flex-1 py-4 text-[11px] font-mono uppercase tracking-widest transition-colors duration-200 ${
-                    active === t ? "text-foreground" : "text-muted-foreground hover:text-foreground/70"
+                    active === t
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground/70"
                   }`}
                 >
                   {t === "login" ? "Sign In" : "Sign Up"}
@@ -329,12 +422,11 @@ function AuthPage() {
                 type="button"
                 className="w-full flex items-center justify-center gap-2.5 py-2.5 rounded-lg border border-border bg-white/[0.03] hover:border-accent/30 hover:bg-white/[0.05] transition-all text-sm font-medium mb-6"
               >
-                {/* Google "G" */}
                 <svg className="size-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Continue with Google
               </button>
@@ -342,7 +434,9 @@ function AuthPage() {
               {/* Divider */}
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex-1 h-px bg-border" />
-                <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">or</span>
+                <span className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-widest">
+                  or
+                </span>
                 <div className="flex-1 h-px bg-border" />
               </div>
 
@@ -357,7 +451,6 @@ function AuthPage() {
             </div>
           </div>
 
-          {/* bottom note */}
           <p className="text-center text-[10px] font-mono text-muted-foreground/40 mt-6 uppercase tracking-widest">
             Encrypted at rest · SOC 2 Compliant
           </p>

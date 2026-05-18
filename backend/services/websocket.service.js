@@ -110,7 +110,7 @@ class WebSocketService {
     const allowedOrigins = [
       ...(config.cors?.allowedOrigins || []),
       `http://${config.server.host}:${config.server.port}`,
-      "http://localhost:3000",
+      "http://localhost:8080",
     ];
 
     return allowedOrigins.includes(origin) || allowedOrigins.includes("*");
