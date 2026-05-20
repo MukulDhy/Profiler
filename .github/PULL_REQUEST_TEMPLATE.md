@@ -1,6 +1,6 @@
-# Inflio Pull Request Template
+# ProFiller Pull Request Template
 
-Thank you for contributing to **Inflio** 🎉  
+Thank you for contributing to **ProFiller** 🎉  
 Please fill out this template so reviewers can understand your changes.
 
 ---
