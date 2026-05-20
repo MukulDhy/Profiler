@@ -49,9 +49,16 @@ const sendTokenResponse = async (user, statusCode, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    const existing = await User.findOne({ email });
+    const { name, email, password} = req.body;
+    if (typeof email !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email",
+      });
+    }
+    const existing = await User.findOne({
+      email: email.trim().toLowerCase(),
+    });
     if (existing) {
       return res.status(409).json({
         success: false,
@@ -59,7 +66,7 @@ export const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email: email.trim().toLowerCase(), password });
 
     await sendTokenResponse(user, 201, res);
   } catch (err) {

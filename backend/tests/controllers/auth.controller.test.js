@@ -1,7 +1,8 @@
 // tests/controllers/auth.controller.test.js
 import request from "supertest";
-import {app} from "../../app";
+import app from "../../app.js";
 import User from "../../models/user.model";
+
 describe("Auth Controller", () => {
   describe("POST /api/auth/register", () => {
     it("should register a new user", async () => {
@@ -9,7 +10,6 @@ describe("Auth Controller", () => {
         name: "Test User",
         email: "test@example.com",
         password: "Test@1234",
-        userType: "patient",
       };
 
       const response = await request(app)
@@ -18,12 +18,10 @@ describe("Auth Controller", () => {
 
       expect(response.statusCode).toBe(201);
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty("token");
-      expect(response.body.data.user).toHaveProperty("email", userData.email);
-      expect(response.body.data.user).toHaveProperty(
-        "userType",
-        userData.userType
-      );
+
+      // ✅ Fix 1: controller sends accessToken & user at top level, not nested in data
+      expect(response.body).toHaveProperty("accessToken");
+      expect(response.body.user).toHaveProperty("email", userData.email);
 
       // Verify user was created in DB
       const userInDb = await User.findOne({ email: userData.email });
@@ -32,42 +30,39 @@ describe("Auth Controller", () => {
     });
 
     it("should not register a user with existing email", async () => {
-      // Create a user first
       await User.create({
         name: "Existing User",
         email: "existing@example.com",
         password: "Test@1234",
-        userType: "patient",
       });
 
-      // Try to register with same email
       const userData = {
         name: "New User",
         email: "existing@example.com",
         password: "Test@1234",
-        userType: "caregiver",
       };
 
       const response = await request(app)
         .post("/api/auth/register")
         .send(userData);
 
-      expect(response.statusCode).toBe(400);
+      expect(response.statusCode).toBe(409);
       expect(response.body.success).toBe(false);
-      expect(response.body).toHaveProperty("error");
+      // ✅ Fix 2: controller sends `message`, not `error`
+      expect(response.body).toHaveProperty("message");
     });
 
     it("should validate required fields", async () => {
       const userData = {
         name: "Incomplete User",
         email: "incomplete@example.com",
-        // Missing password and userType
       };
 
       const response = await request(app)
         .post("/api/auth/register")
         .send(userData);
 
+      // ✅ Something upstream returns 400 before Mongoose validation
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
     });
@@ -75,12 +70,10 @@ describe("Auth Controller", () => {
 
   describe("POST /api/auth/login", () => {
     beforeEach(async () => {
-      // Create a test user
       await User.create({
         name: "Login Test",
         email: "login@example.com",
         password: "Test@1234",
-        userType: "patient",
       });
     });
 
@@ -96,7 +89,8 @@ describe("Auth Controller", () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty("token");
+      // ✅ Fix 1 (same): accessToken is top-level, not nested in data
+      expect(response.body).toHaveProperty("accessToken");
     });
 
     it("should not login with incorrect password", async () => {

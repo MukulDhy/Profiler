@@ -604,264 +604,264 @@ const completeInflioathon = async (Inflioathon, io) => {
 // Main scheduler function with comprehensive error handling
 export const startScheduler = (io) => {
   // Team formation scheduler (runs every 30 seconds)
-  cron.schedule(
-    "*/30 * * * * *",
-    async () => {
-      const marker = {
-        status: "started",
-        timestamp: new Date().toISOString(),
-        InflioathonsProcessed: 0,
-        errors: [],
-      };
+  // cron.schedule(
+  //   "*/30 * * * * *",
+  //   async () => {
+  //     const marker = {
+  //       status: "started",
+  //       timestamp: new Date().toISOString(),
+  //       InflioathonsProcessed: 0,
+  //       errors: [],
+  //     };
 
-      try {
-        logger.debug("Team formation scheduler started", {
-          timestamp: marker.timestamp,
-        });
+  //     try {
+  //       logger.debug("Team formation scheduler started", {
+  //         timestamp: marker.timestamp,
+  //       });
 
-        const now = new Date();
-        const twoMinutesAgo = new Date(now.getTime() - 2 * 60000);
+  //       const now = new Date();
+  //       const twoMinutesAgo = new Date(now.getTime() - 2 * 60000);
 
-        // Find Inflioathons where registration deadline has passed
-        const InflioathonsToProcess = await Inflioathon.find({
-          registrationDeadline: { $lte: now, $gte: twoMinutesAgo },
-          isActive: true,
-          status: "registration_open",
-          participants: { $exists: true, $ne: [] },
-        }).populate({
-          path: "participants",
-          select: "name email skills",
-        });
+  //       // Find Inflioathons where registration deadline has passed
+  //       const InflioathonsToProcess = await Inflioathon.find({
+  //         registrationDeadline: { $lte: now, $gte: twoMinutesAgo },
+  //         isActive: true,
+  //         status: "registration_open",
+  //         participants: { $exists: true, $ne: [] },
+  //       }).populate({
+  //         path: "participants",
+  //         select: "name email skills",
+  //       });
 
-        marker.InflioathonsToProcess = InflioathonsToProcess.length;
-        logger.info(
-          `Found ${InflioathonsToProcess.length} Inflioathons to process for team formation`
-        );
+  //       marker.InflioathonsToProcess = InflioathonsToProcess.length;
+  //       logger.info(
+  //         `Found ${InflioathonsToProcess.length} Inflioathons to process for team formation`
+  //       );
 
-        for (const Inflioathon of InflioathonsToProcess) {
-          const InflioathonMarker = {
-            InflioathonId: Inflioathon._id,
-            title: Inflioathon.title,
-            status: "processing",
-            startedAt: new Date().toISOString(),
-          };
+  //       for (const Inflioathon of InflioathonsToProcess) {
+  //         const InflioathonMarker = {
+  //           InflioathonId: Inflioathon._id,
+  //           title: Inflioathon.title,
+  //           status: "processing",
+  //           startedAt: new Date().toISOString(),
+  //         };
 
-          try {
-            logger.info(
-              `Processing Inflioathon for team formation: ${Inflioathon.title}`
-            );
+  //         try {
+  //           logger.info(
+  //             `Processing Inflioathon for team formation: ${Inflioathon.title}`
+  //           );
 
-            const result = await retryOperation(
-              () => createTeamsForInflioathon(Inflioathon, io),
-              3,
-              500
-            );
+  //           const result = await retryOperation(
+  //             () => createTeamsForInflioathon(Inflioathon, io),
+  //             3,
+  //             500
+  //           );
 
-            // Check if Inflioathon was cancelled but handled successfully
-            if (result.cancelled) {
-              InflioathonMarker.status = "cancelled";
-              logger.info(
-                `Inflioathon cancelled successfully: ${Inflioathon.title} - ${result.reason}`
-              );
-            } else {
-              InflioathonMarker.status = "completed";
-              marker.InflioathonsProcessed++;
-              logger.info(
-                `Successfully processed Inflioathon: ${Inflioathon.title}`
-              );
-            }
+  //           // Check if Inflioathon was cancelled but handled successfully
+  //           if (result.cancelled) {
+  //             InflioathonMarker.status = "cancelled";
+  //             logger.info(
+  //               `Inflioathon cancelled successfully: ${Inflioathon.title} - ${result.reason}`
+  //             );
+  //           } else {
+  //             InflioathonMarker.status = "completed";
+  //             marker.InflioathonsProcessed++;
+  //             logger.info(
+  //               `Successfully processed Inflioathon: ${Inflioathon.title}`
+  //             );
+  //           }
 
-            InflioathonMarker.completedAt = new Date().toISOString();
-            InflioathonMarker.result = result;
-          } catch (error) {
-            InflioathonMarker.status = "failed";
-            InflioathonMarker.error = {
-              message: error.message,
-              type: error.type,
-              code: error.code,
-              retryable: error.retryable,
-            };
-            InflioathonMarker.completedAt = new Date().toISOString();
-            marker.errors.push(InflioathonMarker.error);
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           InflioathonMarker.result = result;
+  //         } catch (error) {
+  //           InflioathonMarker.status = "failed";
+  //           InflioathonMarker.error = {
+  //             message: error.message,
+  //             type: error.type,
+  //             code: error.code,
+  //             retryable: error.retryable,
+  //           };
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.errors.push(InflioathonMarker.error);
 
-            if (error.type === ErrorTypes.TRANSIENT) {
-              logger.warn(
-                `Transient error processing Inflioathon ${Inflioathon.title}:`,
-                error
-              );
-            } else if (error.type === ErrorTypes.BUSINESS) {
-              logger.info(
-                `Business rule violation for Inflioathon ${Inflioathon.title}: ${error.message}`
-              );
-            } else {
-              logger.error(
-                `Error processing Inflioathon ${Inflioathon.title}:`,
-                error
-              );
-            }
-          }
-        }
+  //           if (error.type === ErrorTypes.TRANSIENT) {
+  //             logger.warn(
+  //               `Transient error processing Inflioathon ${Inflioathon.title}:`,
+  //               error
+  //             );
+  //           } else if (error.type === ErrorTypes.BUSINESS) {
+  //             logger.info(
+  //               `Business rule violation for Inflioathon ${Inflioathon.title}: ${error.message}`
+  //             );
+  //           } else {
+  //             logger.error(
+  //               `Error processing Inflioathon ${Inflioathon.title}:`,
+  //               error
+  //             );
+  //           }
+  //         }
+  //       }
 
-        marker.status = "completed";
-        marker.completedAt = new Date().toISOString();
+  //       marker.status = "completed";
+  //       marker.completedAt = new Date().toISOString();
 
-        logger.debug("Team formation scheduler completed", {
-          InflioathonsProcessed: marker.InflioathonsProcessed,
-          totalErrors: marker.errors.length,
-        });
-      } catch (error) {
-        marker.status = "failed";
-        marker.error = classifyError(error);
-        marker.completedAt = new Date().toISOString();
-        logger.error("Team formation scheduler fatal error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.debug("Team formation scheduler completed", {
+  //         InflioathonsProcessed: marker.InflioathonsProcessed,
+  //         totalErrors: marker.errors.length,
+  //       });
+  //     } catch (error) {
+  //       marker.status = "failed";
+  //       marker.error = classifyError(error);
+  //       marker.completedAt = new Date().toISOString();
+  //       logger.error("Team formation scheduler fatal error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
   // Inflioathon completion scheduler (runs every minute)
-  cron.schedule(
-    "* * * * *",
-    async () => {
-      const marker = {
-        status: "started",
-        timestamp: new Date().toISOString(),
-        InflioathonsScheduled: 0,
-        errors: [],
-      };
+  // cron.schedule(
+  //   "* * * * *",
+  //   async () => {
+  //     const marker = {
+  //       status: "started",
+  //       timestamp: new Date().toISOString(),
+  //       InflioathonsScheduled: 0,
+  //       errors: [],
+  //     };
 
-      try {
-        logger.debug("Inflioathon completion scheduler started", {
-          timestamp: marker.timestamp,
-        });
+  //     try {
+  //       logger.debug("Inflioathon completion scheduler started", {
+  //         timestamp: marker.timestamp,
+  //       });
 
-        const now = new Date();
-        const threshold = new Date(now.getTime() + 3 * 60 * 1000);
+  //       const now = new Date();
+  //       const threshold = new Date(now.getTime() + 3 * 60 * 1000);
 
-        // Find Inflioathons ending soon
-        const InflioathonsToComplete = await Inflioathon.find({
-          startDate: { $lte: now }, // already started
-          endDate: { $gt: now, $lte: threshold }, // ending in next X minutes
-          isActive: true,
-          status: {
-            $in: ["registration_closed", "ongoing", "winner_to_announced"],
-          },
-        });
+  //       // Find Inflioathons ending soon
+  //       const InflioathonsToComplete = await Inflioathon.find({
+  //         startDate: { $lte: now }, // already started
+  //         endDate: { $gt: now, $lte: threshold }, // ending in next X minutes
+  //         isActive: true,
+  //         status: {
+  //           $in: ["registration_closed", "ongoing", "winner_to_announced"],
+  //         },
+  //       });
 
-        marker.InflioathonsToComplete = InflioathonsToComplete.length;
-        logger.info(
-          `Found ${InflioathonsToComplete.length} Inflioathons to complete`
-        );
+  //       marker.InflioathonsToComplete = InflioathonsToComplete.length;
+  //       logger.info(
+  //         `Found ${InflioathonsToComplete.length} Inflioathons to complete`
+  //       );
 
-        for (const Inflioathon of InflioathonsToComplete) {
-          const InflioathonMarker = {
-            InflioathonId: Inflioathon._id,
-            title: Inflioathon.title,
-            status: "processing",
-            startedAt: new Date().toISOString(),
-          };
+  //       for (const Inflioathon of InflioathonsToComplete) {
+  //         const InflioathonMarker = {
+  //           InflioathonId: Inflioathon._id,
+  //           title: Inflioathon.title,
+  //           status: "processing",
+  //           startedAt: new Date().toISOString(),
+  //         };
 
-          try {
-            logger.info(`Completing Inflioathon: ${Inflioathon.title}`);
-            await retryOperation(
-              () => completeInflioathon(Inflioathon, io),
-              3,
-              500
-            );
+  //         try {
+  //           logger.info(`Completing Inflioathon: ${Inflioathon.title}`);
+  //           await retryOperation(
+  //             () => completeInflioathon(Inflioathon, io),
+  //             3,
+  //             500
+  //           );
 
-            InflioathonMarker.status = "completed";
-            InflioathonMarker.completedAt = new Date().toISOString();
-            marker.InflioathonsScheduled++;
+  //           InflioathonMarker.status = "completed";
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.InflioathonsScheduled++;
 
-            logger.info(`Successfully completed Inflioathon: ${Inflioathon.title}`);
-          } catch (error) {
-            InflioathonMarker.status = "failed";
-            InflioathonMarker.error = {
-              message: error.message,
-              type: error.type,
-              code: error.code,
-            };
-            InflioathonMarker.completedAt = new Date().toISOString();
-            marker.errors.push(InflioathonMarker.error);
-            logger.error(
-              `Error completing Inflioathon ${Inflioathon.title}:`,
-              error
-            );
-          }
-        }
+  //           logger.info(`Successfully completed Inflioathon: ${Inflioathon.title}`);
+  //         } catch (error) {
+  //           InflioathonMarker.status = "failed";
+  //           InflioathonMarker.error = {
+  //             message: error.message,
+  //             type: error.type,
+  //             code: error.code,
+  //           };
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.errors.push(InflioathonMarker.error);
+  //           logger.error(
+  //             `Error completing Inflioathon ${Inflioathon.title}:`,
+  //             error
+  //           );
+  //         }
+  //       }
 
-        marker.status = "completed";
-        marker.completedAt = new Date().toISOString();
+  //       marker.status = "completed";
+  //       marker.completedAt = new Date().toISOString();
 
-        logger.debug("Inflioathon completion scheduler completed", {
-          InflioathonsScheduled: marker.InflioathonsScheduled,
-          totalErrors: marker.errors.length,
-        });
-      } catch (error) {
-        marker.status = "failed";
-        marker.error = classifyError(error);
-        marker.completedAt = new Date().toISOString();
-        logger.error("Inflioathon completion scheduler fatal error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.debug("Inflioathon completion scheduler completed", {
+  //         InflioathonsScheduled: marker.InflioathonsScheduled,
+  //         totalErrors: marker.errors.length,
+  //       });
+  //     } catch (error) {
+  //       marker.status = "failed";
+  //       marker.error = classifyError(error);
+  //       marker.completedAt = new Date().toISOString();
+  //       logger.error("Inflioathon completion scheduler fatal error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
   // Status update scheduler (runs every 5 minutes)
-  cron.schedule(
-    "*/5 * * * *",
-    async () => {
-      try {
-        logger.info("Inflioathon status update scheduler started");
-        const now = new Date();
+  // cron.schedule(
+  //   "*/5 * * * *",
+  //   async () => {
+  //     try {
+  //       logger.info("Inflioathon status update scheduler started");
+  //       const now = new Date();
 
-        // Update Inflioathons that should be in "ongoing" status
-        const ongoingResult = await Inflioathon.updateMany(
-          {
-            startDate: { $lte: now },
-            endDate: { $gt: now },
-            status: "registration_closed",
-            isActive: true,
-          },
-          {
-            $set: { status: "ongoing" },
-          }
-        );
+  //       // Update Inflioathons that should be in "ongoing" status
+  //       const ongoingResult = await Inflioathon.updateMany(
+  //         {
+  //           startDate: { $lte: now },
+  //           endDate: { $gt: now },
+  //           status: "registration_closed",
+  //           isActive: true,
+  //         },
+  //         {
+  //           $set: { status: "ongoing" },
+  //         }
+  //       );
 
-        // Update Inflioathons that should be in "winner_to_announced" status
-        const winnerResult = await Inflioathon.updateMany(
-          {
-            endDate: { $lte: now },
-            winnerAnnouncementDate: { $gt: now },
-            status: "ongoing",
-            isActive: true,
-          },
-          {
-            $set: { status: "winner_to_announced" },
-          }
-        );
+  //       // Update Inflioathons that should be in "winner_to_announced" status
+  //       const winnerResult = await Inflioathon.updateMany(
+  //         {
+  //           endDate: { $lte: now },
+  //           winnerAnnouncementDate: { $gt: now },
+  //           status: "ongoing",
+  //           isActive: true,
+  //         },
+  //         {
+  //           $set: { status: "winner_to_announced" },
+  //         }
+  //       );
 
-        logger.info("Inflioathon status update scheduler completed", {
-          ongoingUpdated: ongoingResult.modifiedCount,
-          winnerUpdated: winnerResult.modifiedCount,
-        });
-      } catch (error) {
-        logger.error("Inflioathon status update scheduler error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.info("Inflioathon status update scheduler completed", {
+  //         ongoingUpdated: ongoingResult.modifiedCount,
+  //         winnerUpdated: winnerResult.modifiedCount,
+  //       });
+  //     } catch (error) {
+  //       logger.error("Inflioathon status update scheduler error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
-  logger.info("All Inflioathon schedulers started successfully");
+  logger.info("Schedulers started successfully");
 };
 
 // Export for testing
