@@ -15,6 +15,9 @@ export const Route = createFileRoute("/upload")({
 });
 
 const STAGES = [
+  "Uploading the Resume to the Server…",
+  "Parsing the Document…",
+  "Analyzing the Content…",
   "Analyzing resume…",
   "Extracting skills…",
   "Generating AI insights…",
@@ -73,11 +76,10 @@ function UploadPage() {
               setDragOver(false);
               onFiles(e.dataTransfer.files);
             }}
-            className={`relative block rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${
-              dragOver
-                ? "border-accent bg-accent/5"
-                : "border-border bg-panel hover:border-accent/50"
-            }`}
+            className={`relative block rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${dragOver
+              ? "border-accent bg-accent/5"
+              : "border-border bg-panel hover:border-accent/50"
+              }`}
           >
             <div className="absolute inset-0 bg-accent/5 opacity-0 hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="absolute -inset-20 bg-accent/20 blur-3xl opacity-30 animate-pulse-glow pointer-events-none" />
@@ -119,22 +121,20 @@ function UploadPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className={`flex items-center gap-4 p-3 rounded-lg border ${
-                      active
-                        ? "border-accent/30 bg-accent/5"
-                        : done
-                          ? "border-border bg-white/[0.02]"
-                          : "border-border opacity-40"
-                    }`}
+                    className={`flex items-center gap-4 p-3 rounded-lg border ${active
+                      ? "border-accent/30 bg-accent/5"
+                      : done
+                        ? "border-border bg-white/[0.02]"
+                        : "border-border opacity-40"
+                      }`}
                   >
                     <div
-                      className={`size-6 rounded-full border flex items-center justify-center ${
-                        done
-                          ? "bg-accent border-accent text-accent-foreground"
-                          : active
-                            ? "border-accent text-accent"
-                            : "border-border"
-                      }`}
+                      className={`size-6 rounded-full border flex items-center justify-center ${done
+                        ? "bg-accent border-accent text-accent-foreground"
+                        : active
+                          ? "border-accent text-accent"
+                          : "border-border"
+                        }`}
                     >
                       {done ? (
                         <Check className="size-3" />
