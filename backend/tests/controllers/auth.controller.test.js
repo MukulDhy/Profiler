@@ -19,7 +19,7 @@ describe("Auth Controller", () => {
       expect(response.statusCode).toBe(201);
       expect(response.body.success).toBe(true);
 
-      // ✅ Fix 1: controller sends accessToken & user at top level, not nested in data
+      // ✅ Fix 1: controller sends accessToken & user at top leve  l, not nested in data
       expect(response.body).toHaveProperty("accessToken");
       expect(response.body.user).toHaveProperty("email", userData.email);
 
