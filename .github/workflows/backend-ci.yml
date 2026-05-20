@@ -15,6 +15,9 @@ jobs:
       run:
         working-directory: backend
 
+    env:
+      NODE_ENV: test  
+
     steps:
       - uses: actions/checkout@v4
 

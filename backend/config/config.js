@@ -16,22 +16,22 @@ const config = {
   // CORS
   cors: {
     allowedOrigins: [
-      "*",
-      "http://localhost:3000",
+      //"*",
+      //"http://localhost:3000",
+      "http://localhost:8080",
       "http://192.168.0.103:8081",
       "http://192.168.0.103:5000",
     ],
+    credentials : true,
   },
 
   // Environment
   JWT_COOKIE_EXPIRE: process.env.JWT_COOKIE_EXPIRE || 20,
   NODE_ENV: process.env.NODE_ENV || "development",
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:3000",
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:8080",
 
   // Database
-  MONGO_URI:
-    process.env.MONGO_URI || "mongodb://localhost:27017/care-management",
-
+  MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/care-management",
   // Authentication
   JWT_SECRET: process.env.JWT_SECRET || "your_jwt_secret_key_here",
   JWT_EXPIRE: process.env.JWT_EXPIRE || "30d",
