@@ -9,15 +9,15 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
 
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
-    console.log(
-      `DataBase is Connected to Server ${process.env.PORT} and ${conn.connection.host}:${conn.connection.port}`
-        .underline.bgBlue
-    );
+    logger.info(`DataBase is Connected to Server ${process.env.PORT} and ${conn.connection.host}:${conn.connection.port}`);
+    // console.log(
+    //   `DataBase is Connected to Server ${process.env.PORT} and ${conn.connection.host}:${conn.connection.port}`
+    //     .underline.bgBlue
+    // );
     return conn;
   } catch (error) {
     logger.error(`Error connecting to MongoDB: ${error.message}`);
-    console.log(`Error Occured : ${error.message}`.underline.bgRed);
+    // console.log(`Error Occured : ${error.message}`.underline.bgRed);
     if (process.env.NODE_ENV !== "test") {
       process.exit(1);
     } else {

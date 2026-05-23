@@ -12,6 +12,7 @@ import compression from "compression";
 import errorHandler from "./middlewares/error.js";
 import authRouter from "./routes/auth.routes.js";
 import resumeRouter from "./routes/resume.routes.js";
+import {redis,RedisConnection} from "./scale/redis.js";
 // import webSocketService from "./services/websocket.service.js";
 // import ProFillerathonRouter from "./routes/ProFillerthon.routes.js";
 
@@ -42,6 +43,9 @@ app.use(morgan("combined", { stream: logger.stream }));
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
+
+RedisConnection(); 
+
 // Routes
 app.get("/", (req, res) => {
   res.json({
@@ -68,6 +72,7 @@ app.use((req, res, next) => {
 
 // Error handler middleware
 app.use(errorHandler);
+
 
 // Start server
 const PORT = config.server.port;
