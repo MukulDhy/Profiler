@@ -1,6 +1,42 @@
 ﻿import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
+import logger from "../utils/logger.js";
 
-// Protect routes - verify JWT token
+const DEMO_EMAIL = "demo@profilegpt.local";
+const DEMO_PASSWORD = "Demo@12345";
+
+const demoModeEnabled = () => process.env.DEMO_MODE !== "false";
+
+/**
+ * Returns (and creates on first use) the shared demo account. This lets the
+ * upload → analysis pipeline work before real authentication ships.
+ */
+const getDemoUser = async () => {
+  let user = await User.findOne({ email: DEMO_EMAIL });
+
+  if (!user) {
+    try {
+      user = await User.create({
+        email: DEMO_EMAIL,
+        name: "Demo Candidate",
+        username: "democandidate",
+        password: DEMO_PASSWORD,
+        role: "user",
+        isEmailVerified: true,
+        isActive: true,
+      });
+      logger.info(`👤 Demo user created: ${DEMO_EMAIL}`);
+    } catch (error) {
+      // Another request may have created it concurrently.
+      user = await User.findOne({ email: DEMO_EMAIL });
+      if (!user) throw error;
+    }
+  }
+
+  return user;
+};
+
+// Protect routes - verify JWT token, with a demo fallback for local use
 export const protect = async (req, res, next) => {
   try {
     let token;
@@ -12,26 +48,23 @@ export const protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    // Check for token in cookies
-    else if (req.cookies.token) {
+    // Check for token in cookies (only if a cookie parser populated them)
+    else if (req.cookies?.token) {
       token = req.cookies.token;
     }
 
-    // Make sure token exists
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized to access this route",
-      });
-    }
+    if (token) {
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (error) {
+        return res.status(401).json({
+          success: false,
+          message: "Not authorized to access this route",
+        });
+      }
 
-    try {
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Get user from token
-      let user;
-      // const user = await User.findById(decoded.id);
+      const user = await User.findById(decoded.id || decoded.userId);
 
       if (!user) {
         return res.status(401).json({
@@ -40,7 +73,6 @@ export const protect = async (req, res, next) => {
         });
       }
 
-      // Check if user is active
       if (!user.isActive) {
         return res.status(401).json({
           success: false,
@@ -49,15 +81,21 @@ export const protect = async (req, res, next) => {
       }
 
       req.user = user;
-      next();
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized to access this route",
-      });
+      return next();
     }
+
+    // No token → fall back to the shared demo account (unless disabled).
+    if (demoModeEnabled()) {
+      req.user = await getDemoUser();
+      return next();
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "Not authorized to access this route",
+    });
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    logger.error(`Auth middleware error: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: "Server error in authentication",
@@ -94,46 +132,37 @@ export const optionalAuth = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-    }
-    // Check for token in cookies
-    else if (req.cookies.token) {
+    } else if (req.cookies?.token) {
       token = req.cookies.token;
     }
 
     if (token) {
       try {
-        // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Get user from token
-        let user;
-        // const user = await User.findById(decoded.userId);
-
+        const user = await User.findById(decoded.id || decoded.userId);
         if (user && user.isActive) {
           req.user = user;
         }
-      } catch (error) {
-        // Token is invalid, but we don't fail - just continue without user
-        console.log("Invalid token in optional auth");
+      } catch {
+        // Invalid token — continue anonymously.
       }
     }
 
     next();
   } catch (error) {
-    console.error("Optional auth middleware error:", error);
+    logger.error(`Optional auth middleware error: ${error.message}`);
     next();
   }
 };
 
 export const adminSpecialAuth = async (req, res, next) => {
   try {
-    let email = req.headers["x-admin-email"];
+    const email = req.headers["x-admin-email"];
 
     if (!email) {
       return res.status(401).json({
@@ -141,8 +170,8 @@ export const adminSpecialAuth = async (req, res, next) => {
         message: "Unauthorized: Missing admin credentials",
       });
     }
-    let adminUser;
-    // const adminUser = await User.findOne({ email: email, role: "admin" });
+
+    const adminUser = await User.findOne({ email, role: "admin" });
 
     if (!adminUser) {
       return res.status(401).json({
@@ -154,7 +183,7 @@ export const adminSpecialAuth = async (req, res, next) => {
     req.user = adminUser;
     next();
   } catch (error) {
-    console.error("Admin special auth middleware error:", error);
+    logger.error(`Admin special auth middleware error: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: "Server error in admin authentication",

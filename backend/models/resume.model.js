@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+const analysisMetaSchema = new mongoose.Schema(
+  {
+    provider: String,
+    model: String,
+    durationMs: Number,
+    attempts: { type: Number, default: 0 },
+    providerTrail: [
+      {
+        _id: false,
+        provider: String,
+        model: String,
+        status: String,
+        error: String,
+      },
+    ],
+    warnings: [String],
+    analysedAt: Date,
+    error: { type: String, default: null },
+  },
+  { _id: false }
+);
+
 const uploadSchema = new mongoose.Schema(
   {
     userId: {
@@ -44,6 +66,26 @@ const uploadSchema = new mongoose.Schema(
       default: "",
     },
 
+    /**
+     * Full dashboard-ready payload produced by the AI Analyser.
+     * Shape: { candidate, analysis, skills, radarSkills, timeline, projects,
+     *          platforms, recruiterInsights, codingActivity }
+     */
+    profile: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    /**
+     * Diagnostic metadata about the analysis run (which provider/model was
+     * used, how long it took, fallback attempts and any error).
+     */
+    analysisMeta: {
+      type: analysisMetaSchema,
+      default: () => ({}),
+    },
+
+    // Legacy flattened analysis (kept in sync for existing consumers).
     analysis: {
       score: {
         type: Number,
@@ -80,9 +122,9 @@ const uploadSchema = new mongoose.Schema(
   }
 );
 
-
 // Compound index
 uploadSchema.index({ userId: 1, createdAt: -1 });
+uploadSchema.index({ userId: 1, processingStatus: 1, createdAt: -1 });
 
 const Upload = mongoose.model("Upload", uploadSchema);
 
