@@ -30,9 +30,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [8, "Password must be at least 8 characters long"],
-      select: false, // ✅ exclude from queries by default
+      select: false,
       validate: {
         validator: function (password) {
+          // Skipped for OAuth-only accounts, which get a generated password.
+          if (this.provider === "google" && this.isNew && !password) return true;
           return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
             password
           );
@@ -42,32 +44,16 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    // Added userType field (was missing — caused test failures)
-    // userType: {
-    //   type: String,
-    //   required: [true, "User type is required"],
-    //   enum: {
-    //     values: ["patient", "caregiver", "doctor"],
-    //     message: "userType must be patient, caregiver, or doctor",
-    //   },
-    // },
-
-    role: {
+    username: {
       type: String,
-      required: true,
-      default: "user",
+      trim: true,
+      maxlength: [30, "Username cannot exceed 30 characters"],
     },
 
     location: {
       type: String,
       trim: true,
       maxlength: [100, "Location cannot exceed 100 characters"],
-    },
-
-    username: {
-      type: String,
-      trim: true,
-      maxlength: [15, "Username cannot exceed 15 characters"],
     },
 
     phone: {
@@ -84,23 +70,45 @@ const userSchema = new mongoose.Schema(
       },
     },
 
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+
     profilePicture: {
       type: String,
-      default:
-        "https://static.vecteezy.com/system/resources/previews/054/078/735/non_2x/gamer-avatar-with-headphones-and-controller-vector.jpg",
+      default: "",
       validate: {
         validator: function (url) {
-          if (!url || url === "default-avatar.png") return true;
+          if (!url) return true;
           return /^https?:\/\/[^\s]+$/.test(url);
         },
         message: "Please provide a valid image URL",
       },
     },
 
-    bio: {
+    githubUsername: {
       type: String,
       trim: true,
-      maxlength: 500,
+      maxlength: [39, "GitHub username cannot exceed 39 characters"],
+    },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+
+    googleId: {
+      type: String,
+      select: false,
     },
 
     isEmailVerified: {
@@ -113,39 +121,48 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
-    lastLogin: {
-      type: Date,
+    lastLogin: Date,
+
+    refreshToken: {
+      type: String,
+      select: false,
     },
 
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    refreshToken: String,
+
+    emailVerificationOtpHash: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: Date,
   },
   {
     timestamps: true,
-    // Merged into one toJSON block — fixes the overwrite bug
     toJSON: {
       virtuals: true,
-      transform: function (doc, ret) {
+      transform: function (_doc, ret) {
         delete ret.password;
+        delete ret.refreshToken;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpires;
-        delete ret.refreshToken; 
+        delete ret.emailVerificationOtpHash;
+        delete ret.emailVerificationExpires;
+        delete ret.googleId;
+        delete ret.__v;
         return ret;
       },
     },
-    toObject: {
-      virtuals: true,
-    },
+    toObject: { virtuals: true },
   }
 );
 
-// Indexes
-userSchema.index({ email: 1 });
+userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ createdAt: -1 });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
+
   try {
     const saltRounds = process.env.NODE_ENV === "test" ? 4 : 12;
     this.password = await bcrypt.hash(this.password, saltRounds);
@@ -155,45 +172,58 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Compare password for login
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Generate JWT token
 userSchema.methods.generateToken = function () {
   return jwt.sign(
     { id: this._id, email: this.email },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE || "7d" }
+    { expiresIn: process.env.JWT_EXPIRE || "15m" }
   );
 };
 
-// Generate password reset token
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    { id: this._id, type: "refresh" },
+    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_REFRESH_EXPIRE || "30d" }
+  );
+};
+
+userSchema.methods.hashRefreshToken = function (token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+};
+
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
+
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
-  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+
   return resetToken;
 };
 
-// Virtual: profile completion percentage
+userSchema.methods.createEmailVerificationOtp = function () {
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  this.emailVerificationOtpHash = crypto
+    .createHash("sha256")
+    .update(otp)
+    .digest("hex");
+  this.emailVerificationExpires = Date.now() + 10 * 60 * 1000;
+  return otp;
+};
+
 userSchema.virtual("profileCompletion").get(function () {
   const fields = ["name", "email", "phone", "profilePicture", "bio"];
-  const filledFields = fields.filter((field) => {
-    if (field === "profilePicture")
-      return (
-        this[field] &&
-        this[field] !==
-          "https://static.vecteezy.com/system/resources/previews/054/078/735/non_2x/gamer-avatar-with-headphones-and-controller-vector.jpg"
-      );
-    return !!this[field];
-  });
-  return Math.round((filledFields.length / fields.length) * 100);
+  const filled = fields.filter((field) => Boolean(this[field]));
+  return Math.round((filled.length / fields.length) * 100);
 });
 
 const User = mongoose.model("User", userSchema);
+
 export default User;

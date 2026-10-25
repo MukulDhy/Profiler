@@ -19,7 +19,3 @@ dependencies = [
     "pyyaml>=6.0.3",
     "uvicorn[standard]>=0.54.0",
 ]
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []

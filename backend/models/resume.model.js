@@ -112,6 +112,24 @@ const uploadSchema = new mongoose.Schema(
       default: "uploaded",
     },
 
+    // ─── Public sharing ──────────────────────────────────────────────────────
+    shareToken: {
+      type: String,
+      index: true,
+      sparse: true,
+    },
+
+    isPublic: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+
+    sharedAt: {
+      type: Date,
+      default: null,
+    },
+
     isDeleted: {
       type: Boolean,
       default: false,

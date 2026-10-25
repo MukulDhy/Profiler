@@ -115,6 +115,13 @@ export interface AnalysisMeta {
   error?: string | null;
 }
 
+export interface Sharing {
+  isPublic: boolean;
+  shareToken: string | null;
+  sharedAt: string | null;
+  url: string | null;
+}
+
 export interface UploadSummary {
   id: string;
   fileName: string;
@@ -123,6 +130,12 @@ export interface UploadSummary {
   url: string;
   createdAt: string;
   updatedAt?: string;
+  processingStatus?: ProcessingStatus;
+  analysisMeta?: AnalysisMeta | null;
+  isPublic?: boolean;
+  shareToken?: string | null;
+  sharedAt?: string | null;
+  sharing?: Sharing;
 }
 
 export interface ResumeProfileResponse {
@@ -130,4 +143,178 @@ export interface ResumeProfileResponse {
   processingStatus: ProcessingStatus | null;
   profile: ResumeProfile | null;
   analysisMeta: AnalysisMeta | null;
+  sharing?: Sharing;
+}
+
+export interface ResumeListResponse {
+  uploads: UploadSummary[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+export interface AuthUser {
+  _id?: string;
+  id?: string;
+  name: string;
+  email: string;
+  username?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  phone?: string | null;
+  profilePicture?: string | null;
+  githubUsername?: string | null;
+  role?: "user" | "admin";
+  provider?: "local" | "google";
+  isEmailVerified?: boolean;
+  createdAt?: string;
+  lastLogin?: string;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  accessToken?: string;
+}
+
+export interface AuthConfig {
+  googleEnabled: boolean;
+  demoEnabled: boolean;
+  requireEmailVerification: boolean;
+}
+
+export interface MeResponse {
+  user: AuthUser;
+  isDemo: boolean;
+}
+
+// ─── Chat ────────────────────────────────────────────────────────────────────
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  resumeId: string;
+  messageCount: number;
+  lastMessage: string;
+  lastMessageAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessageRecord {
+  id?: string;
+  role: "user" | "assistant";
+  content: string;
+  provider?: string | null;
+  model?: string | null;
+  createdAt?: string;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  resumeId: string;
+  messages: ChatMessageRecord[];
+  lastMessageAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SendMessageResponse {
+  conversationId: string;
+  message: ChatMessageRecord;
+  suggestions: string[];
+  title: string;
+}
+
+// ─── Notes ───────────────────────────────────────────────────────────────────
+
+export interface Note {
+  id: string;
+  resumeId: string;
+  conversationId: string | null;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Job match ───────────────────────────────────────────────────────────────
+
+export interface JobMatch {
+  score: number;
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  strengths: string[];
+  gaps: string[];
+  suggestions: string[];
+  verdict: string;
+  provider?: string | null;
+  model?: string | null;
+}
+
+// ─── GitHub ──────────────────────────────────────────────────────────────────
+
+export interface GithubActivity {
+  username: string;
+  user: {
+    name: string;
+    avatar: string;
+    bio: string;
+    url: string;
+    company: string;
+    location: string;
+    createdAt: string;
+  };
+  stats: {
+    publicRepos: number;
+    followers: number;
+    following: number;
+    totalStars: number;
+    commitsLast90Days: number;
+  };
+  languages: Array<{ name: string; count: number }>;
+  activity: CodingActivityPoint[];
+  repos: Array<{
+    name: string;
+    description: string;
+    url: string;
+    stars: number;
+    forks: number;
+    language: string;
+    updatedAt: string;
+  }>;
+  fetchedAt: string;
+}
+
+// ─── Public sharing ──────────────────────────────────────────────────────────
+
+export interface PublicProfile {
+  profile: ResumeProfile;
+  owner: {
+    name: string;
+    username: string | null;
+    bio: string;
+    avatar: string;
+    location: string;
+    githubUsername: string | null;
+  };
+  resume: {
+    fileName: string;
+    fileType: string;
+    analysedAt: string;
+  };
+  sharedAt: string;
+}
+
+export interface PublicChatResponse {
+  answer: string;
+  suggestions: string[];
+  provider?: string | null;
+  model?: string | null;
 }

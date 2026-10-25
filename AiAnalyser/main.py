@@ -19,10 +19,5 @@ def main() -> None:
     uvicorn.run(app, host=settings.host, port=settings.port, log_level="info")
 
 
-
-def main():
-    
-
-
 if __name__ == "__main__":
     main()

@@ -19,8 +19,12 @@ import {
   getLatestResumeProfile,
   getResumeProfile,
   getRememberedResumeId,
+  getMyGithubActivity,
+  shareResume,
+  revokeResumeShare,
   LAST_RESUME_KEY,
 } from "@/lib/api";
+import { ShareDialog } from "@/components/share/ShareDialog";
 import {
   buildDashboardView,
   type DashboardCandidate,
@@ -28,8 +32,10 @@ import {
 } from "@/lib/view";
 import type {
   CodingActivityPoint,
+  GithubActivity,
   Platform,
   RadarSkill,
+  Sharing,
   Skill,
   TimelineItem,
 } from "@/lib/types";
@@ -42,6 +48,10 @@ import {
   Sparkles,
   AlertCircle,
   Loader2,
+  Search,
+  Share2,
+  Star,
+  GitFork,
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -75,6 +85,10 @@ function DashboardPage() {
 
   const activeId = id ?? storedId;
 
+  const [search, setSearch] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [sharing, setSharing] = useState<Sharing | null>(null);
+
   const query = useQuery({
     queryKey: ["resume-profile", activeId ?? "latest"],
     queryFn: ({ signal }) =>
@@ -87,6 +101,21 @@ function DashboardPage() {
     enabled: typeof window !== "undefined",
     retry: 1,
     staleTime: 15_000,
+  });
+
+  useEffect(() => {
+    setSharing(query.data?.sharing ?? null);
+  }, [query.data?.sharing]);
+
+  const githubQuery = useQuery({
+    queryKey: ["github-activity", query.data?.upload?.id ?? "none"],
+    queryFn: () => getMyGithubActivity(),
+    enabled:
+      typeof window !== "undefined" &&
+      Boolean(query.data?.profile) &&
+      query.data?.processingStatus === "completed",
+    retry: false,
+    staleTime: 10 * 60 * 1000,
   });
 
   const view = useMemo(
@@ -160,7 +189,7 @@ function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-full">
       {query.data?.processingStatus === "processing" && (
         <div className="border-b border-accent/20 bg-accent/5 px-6 lg:px-8 py-2 text-xs text-accent flex items-center gap-2">
           <Loader2 className="size-3 animate-spin" />
@@ -177,8 +206,16 @@ function DashboardPage() {
           </span>
         </div>
       )}
-      <Header candidate={view.candidate} isLive={view.isLive} />
+      <Header
+        candidate={view.candidate}
+        isLive={view.isLive}
+        search={search}
+        onSearch={setSearch}
+        shared={Boolean(sharing?.isPublic)}
+        onShare={() => setShareOpen(true)}
+      />
       <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
+        {search.trim() && <SearchResults view={view} query={search} />}
         <StatGrid view={view} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <AISummary candidate={view.candidate} />
@@ -186,14 +223,35 @@ function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <SkillsRadar data={view.radarSkills} />
-          <CodingActivity data={view.codingActivity} />
+          <CodingActivity
+            data={githubQuery.data?.activity ?? view.codingActivity}
+            github={githubQuery.data ?? null}
+          />
         </div>
         <SkillsBreakdown skills={view.skills} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Timeline timeline={view.timeline} />
           <ConnectedPlatforms platforms={view.platforms} />
         </div>
+        {githubQuery.data && <GithubPanel github={githubQuery.data} />}
       </div>
+
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        sharing={sharing}
+        resumeId={query.data?.upload?.id}
+        onShare={async (resumeId) => {
+          const next = await shareResume(resumeId);
+          setSharing(next);
+          return next;
+        }}
+        onRevoke={async (resumeId) => {
+          const next = await revokeResumeShare(resumeId);
+          setSharing(next);
+          return next;
+        }}
+      />
     </div>
   );
 }
@@ -201,9 +259,17 @@ function DashboardPage() {
 function Header({
   candidate,
   isLive,
+  search,
+  onSearch,
+  shared,
+  onShare,
 }: {
   candidate: DashboardCandidate;
   isLive: boolean;
+  search: string;
+  onSearch: (value: string) => void;
+  shared: boolean;
+  onShare: () => void;
 }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
@@ -232,12 +298,21 @@ function Header({
             />
             {isLive ? "Live analysis" : "Demo data"}
           </span>
-          <input
-            placeholder="Search insights, projects, skills…"
-            className="hidden md:block bg-panel border border-border rounded-md px-3 py-2 text-sm w-64 focus:outline-none focus:border-accent transition-colors"
-          />
-          <button className="hidden sm:block px-4 py-2 bg-accent text-accent-foreground rounded-md text-sm font-semibold hover:brightness-110 transition-all">
-            Share Profile
+          <div className="hidden md:flex relative items-center">
+            <Search className="absolute left-2.5 size-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              value={search}
+              onChange={(event) => onSearch(event.target.value)}
+              placeholder="Search insights, projects, skills…"
+              className="bg-panel border border-border rounded-md pl-8 pr-3 py-2 text-sm w-64 focus:outline-none focus:border-accent transition-colors"
+            />
+          </div>
+          <button
+            onClick={onShare}
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-md text-sm font-semibold hover:brightness-110 transition-all"
+          >
+            <Share2 className="size-3.5" />
+            {shared ? "Manage Share" : "Share Profile"}
           </button>
         </div>
       </div>
@@ -438,12 +513,30 @@ function SkillsRadar({ data }: { data: RadarSkill[] }) {
   );
 }
 
-function CodingActivity({ data }: { data: CodingActivityPoint[] }) {
+function CodingActivity({
+  data,
+  github,
+}: {
+  data: CodingActivityPoint[];
+  github: GithubActivity | null;
+}) {
   return (
     <div className="p-6 rounded-xl border border-border bg-panel">
-      <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-4">
-        Coding Activity (last 8 months)
-      </h3>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+          Coding Activity (last 8 months)
+        </h3>
+        {github && (
+          <a
+            href={github.user.url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-accent hover:underline"
+          >
+            <Github className="size-3" />@{github.username}
+          </a>
+        )}
+      </div>
       <div className="h-72">
         {data.length === 0 ? (
           <EmptyState message="A resume cannot provide commit history. Connect a GitHub account to unlock this chart." />
@@ -606,6 +699,243 @@ function ConnectedPlatforms({ platforms }: { platforms: Platform[] }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function SearchResults({
+  view,
+  query,
+}: {
+  view: DashboardView;
+  query: string;
+}) {
+  const term = query.trim().toLowerCase();
+
+  const items: Array<{ kind: string; title: string; detail: string; ask: string }> = [];
+
+  const push = (kind: string, title: string, detail: string, ask: string) => {
+    if (`${title} ${detail}`.toLowerCase().includes(term)) {
+      items.push({ kind, title, detail, ask });
+    }
+  };
+
+  push(
+    "Candidate",
+    view.candidate.name,
+    `${view.candidate.title} · ${view.candidate.summary}`,
+    `Give me a concise overview of ${view.candidate.name}.`
+  );
+
+  for (const skill of view.skills) {
+    push(
+      "Skill",
+      skill.name,
+      `${skill.group} · proficiency ${skill.level}/100`,
+      `How strong is ${view.candidate.name} in ${skill.name}, and what evidence supports that?`
+    );
+  }
+
+  for (const project of view.projects) {
+    push(
+      "Project",
+      project.name,
+      `${project.tagline} ${project.tech.join(", ")}`,
+      `Walk me through the ${project.name} project: architecture, decisions and impact.`
+    );
+  }
+
+  for (const item of view.timeline) {
+    push(
+      "Experience",
+      `${item.role} at ${item.org}`,
+      `${item.year} · ${item.blurb}`,
+      `What did ${view.candidate.name} do as ${item.role} at ${item.org}?`
+    );
+  }
+
+  for (const platform of view.platforms) {
+    push(
+      "Platform",
+      platform.name,
+      platform.handle || platform.stat,
+      `What does ${view.candidate.name}'s ${platform.name} profile show?`
+    );
+  }
+
+  for (const fit of view.recruiterInsights.roleFits) {
+    push(
+      "Role fit",
+      fit.role,
+      `${fit.score}% · ${fit.verdict}`,
+      `Why is ${view.candidate.name} a ${fit.verdict.toLowerCase()} for ${fit.role}?`
+    );
+  }
+
+  const shown = items.slice(0, 10);
+
+  return (
+    <div className="rounded-xl border border-accent/25 bg-panel p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <Search className="size-4 text-accent" />
+        <span className="text-[10px] font-mono uppercase tracking-widest text-accent">
+          Search results
+        </span>
+        <span className="ml-auto text-[10px] font-mono text-muted-foreground">
+          {items.length} match{items.length === 1 ? "" : "es"}
+        </span>
+      </div>
+
+      {shown.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Nothing in this profile matches “{query}”. Try a skill, project or role.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {shown.map((item) => (
+            <Link
+              key={`${item.kind}-${item.title}-${item.detail}`}
+              to="/chat"
+              search={{ prompt: item.ask }}
+              className="flex items-start gap-3 rounded-lg border border-border bg-background/40 p-3 hover:border-accent/40 transition-colors"
+            >
+              <span className="mt-0.5 shrink-0 px-1.5 py-0.5 rounded border border-accent/25 bg-accent/10 text-[9px] font-mono uppercase tracking-wider text-accent">
+                {item.kind}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-medium truncate">
+                  {item.title}
+                </span>
+                <span className="block text-xs text-muted-foreground line-clamp-2">
+                  {item.detail}
+                </span>
+              </span>
+              <ArrowUpRight className="size-4 text-muted-foreground shrink-0 ml-auto" />
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GithubPanel({ github }: { github: GithubActivity }) {
+  return (
+    <div className="rounded-xl border border-border bg-panel p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          {github.user.avatar ? (
+            <img
+              src={github.user.avatar}
+              alt={github.user.name}
+              className="size-10 rounded-full border border-border object-cover"
+            />
+          ) : (
+            <div className="size-10 rounded-full bg-stone-800 flex items-center justify-center">
+              <Github className="size-4" />
+            </div>
+          )}
+          <div>
+            <h3 className="text-sm font-semibold">{github.user.name}</h3>
+            <a
+              href={github.user.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[10px] font-mono uppercase tracking-widest text-accent hover:underline"
+            >
+              @{github.username}
+            </a>
+          </div>
+        </div>
+        <a
+          href={github.user.url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs hover:border-accent/40 transition-colors"
+        >
+          <Github className="size-3" /> View GitHub
+        </a>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        {[
+          ["Repos", String(github.stats.publicRepos)],
+          ["Stars", String(github.stats.totalStars)],
+          ["Followers", String(github.stats.followers)],
+          ["Commits (90d)", String(github.stats.commitsLast90Days)],
+          ["Languages", String(github.languages.length)],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-lg border border-border p-3">
+            <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+              {label}
+            </div>
+            <div className="text-lg font-semibold">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">
+            Top repositories
+          </div>
+          <div className="space-y-2">
+            {github.repos.length === 0 && (
+              <p className="text-xs text-muted-foreground">No public repositories found.</p>
+            )}
+            {github.repos.map((repo) => (
+              <a
+                key={repo.name}
+                href={repo.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-start gap-3 rounded-lg border border-border p-3 hover:border-accent/40 transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium truncate">{repo.name}</div>
+                  <div className="text-xs text-muted-foreground line-clamp-1">
+                    {repo.description || repo.language || "No description"}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-[10px] font-mono text-muted-foreground shrink-0">
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="size-3" />
+                    {repo.stars}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <GitFork className="size-3" />
+                    {repo.forks}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">
+            Languages
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {github.languages.map((language) => (
+              <span
+                key={language.name}
+                className="px-2.5 py-1 rounded-full border border-border bg-background/40 text-xs"
+              >
+                {language.name}
+                <span className="ml-1.5 font-mono text-[10px] text-accent">
+                  {language.count}
+                </span>
+              </span>
+            ))}
+          </div>
+          {github.user.bio && (
+            <p className="mt-5 text-sm text-muted-foreground leading-relaxed">
+              {github.user.bio}
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

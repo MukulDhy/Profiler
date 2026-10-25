@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { UploadCloud, FileText, Check, AlertCircle, RotateCcw } from "lucide-react";
-import { SiteNav } from "@/components/site/SiteNav";
+import { AppShell } from "@/components/layout/AppShell";
 import {
   pollResume,
   rememberResumeId,
@@ -21,7 +21,11 @@ export const Route = createFileRoute("/upload")({
       },
     ],
   }),
-  component: UploadPage,
+  component: () => (
+    <AppShell>
+      <UploadPage />
+    </AppShell>
+  ),
 });
 
 const STAGES = [
@@ -124,9 +128,8 @@ function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteNav />
-      <div className="pt-32 pb-20 px-6 max-w-3xl mx-auto">
+    <div className="min-h-full bg-background text-foreground">
+      <div className="pt-16 pb-20 px-6 max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-[11px] font-mono uppercase tracking-widest mb-6">
             <span className="size-1.5 rounded-full bg-accent animate-pulse" />

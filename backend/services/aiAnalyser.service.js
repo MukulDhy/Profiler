@@ -137,3 +137,72 @@ export const aiAnalyserHealth = async () => {
   });
   return data;
 };
+
+/**
+ * POST a JSON payload to the AI service and return its `data` object.
+ * Chat and job-match are fast, so they use a shorter timeout than the
+ * document-analysis pipeline.
+ */
+const postJson = async (path, payload, timeout = 120_000) => {
+  try {
+    const { data } = await axios.post(`${baseUrl()}${path}`, payload, {
+      timeout,
+      headers: { "Content-Type": "application/json", ...serviceHeaders() },
+    });
+
+    if (!data?.data) {
+      throw new Error("AI Analyser returned an empty response.");
+    }
+
+    return data.data;
+  } catch (error) {
+    const wrapped = new Error(extractErrorMessage(error));
+    wrapped.statusCode = error?.response?.status || 502;
+    wrapped.cause = error;
+    throw wrapped;
+  }
+};
+
+/**
+ * Answer a question grounded in the full structured profile + extracted text.
+ *
+ * @returns {Promise<{ answer: string, suggestions: string[], provider?: string, model?: string }>}
+ */
+export const chatWithProfile = async ({
+  profile,
+  extractedText = "",
+  messages = [],
+  question,
+  provider,
+  model,
+}) =>
+  postJson("/api/v1/chat", {
+    profile: profile || {},
+    extracted_text: extractedText || "",
+    messages: (messages || []).map((message) => ({
+      role: message.role,
+      content: message.content,
+    })),
+    question,
+    provider,
+    model,
+  });
+
+/**
+ * Score a profile against a job description.
+ *
+ * @returns {Promise<{ score: number, matchedKeywords: string[], missingKeywords: string[], strengths: string[], gaps: string[], suggestions: string[], verdict: string }>}
+ */
+export const matchJobDescription = async ({
+  profile,
+  jobDescription,
+  provider,
+  model,
+}) =>
+  postJson("/api/v1/job-match", {
+    profile: profile || {},
+    job_description: jobDescription,
+    provider,
+    model,
+  });
+

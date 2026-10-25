@@ -1,33 +1,64 @@
 import express from "express";
-import { register, login } from "../controllers/auth.controller.js";
-import { protect } from "../middlewares/auth.js";
-import { validateRegistration, validateLogin } from "../utils/validators.js";
+import {
+  changePassword,
+  deactivateAccount,
+  demoLogin,
+  forgotPassword,
+  getAuthConfig,
+  getMe,
+  googleAuth,
+  login,
+  logout,
+  refresh,
+  register,
+  removeAvatar,
+  resetPassword,
+  sendEmailVerification,
+  updateProfile,
+  uploadAvatar,
+  verifyEmail,
+} from "../controllers/auth.controller.js";
+import { optionalAuth, protect } from "../middlewares/auth.js";
+import { authLimiter } from "../middlewares/rateLimit.js";
+import { upload } from "../utils/uploadImage.js";
+import {
+  validateEmail,
+  validateGoogleAuth,
+  validateLogin,
+  validatePasswordChange,
+  validatePasswordReset,
+  validateProfileUpdate,
+  validateRegistration,
+} from "../utils/validators.js";
 
 const router = express.Router();
 
 // ─── Public routes ────────────────────────────────────────────────────────────
-router.post("/register", validateRegistration, register);
-router.post("/login", validateLogin, login);
+router.get("/config", getAuthConfig);
+router.post("/register", authLimiter, validateRegistration, register);
+router.post("/login", authLimiter, validateLogin, login);
+router.post("/demo", authLimiter, demoLogin);
+router.post("/google", authLimiter, validateGoogleAuth, googleAuth);
+router.post("/refresh", refresh);
+router.post("/logout", optionalAuth, logout);
+router.post("/forgot-password", authLimiter, validateEmail, forgotPassword);
+router.put(
+  "/reset-password/:token",
+  authLimiter,
+  validatePasswordReset,
+  resetPassword
+);
+router.post("/verify-email", verifyEmail);
 
-// router.post("/google", googleAuth);
-// router.post("/forgot-password", forgotPassword);
-// router.post("/verify-otp", verifyOtp);
-// router.post("/reset-password", resetPassword);
-// router.put("/reset-password/:token", resetPassword);
-// router.get("/verify-email/:token", verifyEmail);
-
-// ─── Protected routes (require authentication) ────────────────────────────────
+// ─── Protected routes ─────────────────────────────────────────────────────────
 router.use(protect);
 
-// router.get("/verify", verifyingProfile);
-// router.get("/me", getMe);
-// router.put("/profile", updateProfile);
-// router.post("/upload-avatar", uploadAvatar);
-// router.delete("/remove-avatar", removeAvatar);
-// router.put("/social-links", updateSocialLinks);
-// router.put("/change-password", changePassword);
-// router.post("/send-verification", sendEmailVerification);
-// router.post("/logout", logout);
-// router.put("/deactivate", deactivateAccount);
+router.get("/me", getMe);
+router.put("/profile", validateProfileUpdate, updateProfile);
+router.put("/change-password", validatePasswordChange, changePassword);
+router.post("/send-verification", sendEmailVerification);
+router.post("/avatar", upload.single("avatar"), uploadAvatar);
+router.delete("/avatar", removeAvatar);
+router.put("/deactivate", deactivateAccount);
 
 export default router;

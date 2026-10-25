@@ -1,6 +1,6 @@
-# ProFiller Pull Request Template
+# ProfileGPT Pull Request Template
 
-Thank you for contributing to **ProFiller** 🎉  
+Thank you for contributing to **ProfileGPT** 🎉  
 Please fill out this template so reviewers can understand your changes.
 
 ---
