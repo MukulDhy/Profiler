@@ -1,6 +1,24 @@
 [project]
 name = "aianalyser"
 version = "0.1.0"
+description = "ProfileGPT AI analyser — Docling + LangGraph resume analysis"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "docling>=2.142.1",
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "langchain-core>=1.7.0",
+    "langchain-google-genai>=4.4.2",
+    "langchain-openai>=1.7.2",
+    "langgraph>=1.2.17",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.1",
+    "python-dotenv>=1.2.4",
+    "python-multipart>=0.0.32",
+    "pyyaml>=6.0.3",
+    "uvicorn[standard]>=0.54.0",
+]
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"

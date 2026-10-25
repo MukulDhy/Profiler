@@ -1,50 +1,127 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
-import { UploadCloud, FileText, Check } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { UploadCloud, FileText, Check, AlertCircle, RotateCcw } from "lucide-react";
 import { SiteNav } from "@/components/site/SiteNav";
+import {
+  pollResume,
+  rememberResumeId,
+  uploadResume,
+  validateResumeFile,
+} from "@/lib/api";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
     meta: [
       { title: "Upload Resume — ProfileGPT" },
-      { name: "description", content: "Upload your resume and watch it become an interactive AI profile." },
+      {
+        name: "description",
+        content:
+          "Upload your resume and watch it become an interactive AI profile.",
+      },
     ],
   }),
   component: UploadPage,
 });
 
 const STAGES = [
-  "Analyzing resume…",
-  "Extracting skills…",
+  "Uploading resume…",
+  "Extracting document structure…",
   "Generating AI insights…",
   "Building career graph…",
   "Deploying neural profile…",
 ];
 
+type Phase = "idle" | "working" | "error";
+
 function UploadPage() {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [stage, setStage] = useState(-1);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
+  // Visual progress while the real pipeline runs. Completion is driven by the
+  // backend status, never by this timer.
   useEffect(() => {
-    if (stage < 0 || stage >= STAGES.length) return;
-    const t = setTimeout(() => {
-      if (stage === STAGES.length - 1) {
-        navigate({ to: "/dashboard" });
-      } else {
-        setStage(stage + 1);
-      }
-    }, 1100);
-    return () => clearTimeout(t);
-  }, [stage, navigate]);
+    if (phase !== "working") return;
+    const timer = setInterval(() => {
+      setStage((current) => Math.min(current + 1, STAGES.length - 2));
+    }, 8_000);
+    return () => clearInterval(timer);
+  }, [phase]);
 
-  const onFiles = useCallback((f: FileList | null) => {
-    if (!f || !f[0]) return;
-    setFile(f[0]);
-    setStage(0);
-  }, []);
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const startUpload = useCallback(
+    async (selected: File) => {
+      const validationError = validateResumeFile(selected);
+      if (validationError) {
+        setFile(selected);
+        setError(validationError);
+        setPhase("error");
+        return;
+      }
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      setFile(selected);
+      setError(null);
+      setPhase("working");
+      setStage(0);
+
+      try {
+        const upload = await uploadResume(selected);
+        rememberResumeId(upload.id);
+        setStage(1);
+
+        await pollResume(upload.id, {
+          signal: controller.signal,
+          onStatus: (response) => {
+            if (response.processingStatus === "processing") {
+              setStage((current) => Math.max(current, 1));
+            }
+          },
+        });
+
+        setStage(STAGES.length - 1);
+        window.setTimeout(() => {
+          navigate({ to: "/dashboard", search: { id: upload.id } });
+        }, 700);
+      } catch (caught) {
+        if (controller.signal.aborted) return;
+        setError(
+          caught instanceof Error
+            ? caught.message
+            : "Something went wrong while analysing the resume."
+        );
+        setPhase("error");
+      }
+    },
+    [navigate]
+  );
+
+  const onFiles = useCallback(
+    (files: FileList | null) => {
+      const selected = files?.[0];
+      if (!selected) return;
+      void startUpload(selected);
+    },
+    [startUpload]
+  );
+
+  const reset = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setFile(null);
+    setError(null);
+    setStage(-1);
+    setPhase("idle");
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -56,12 +133,15 @@ function UploadPage() {
             Ingestion Engine
           </div>
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4">
-            Drop your resume. <span className="text-accent">Become queryable.</span>
+            Drop your resume.{" "}
+            <span className="text-accent">Become queryable.</span>
           </h1>
-          <p className="text-muted-foreground">PDF or DOCX · Max 10MB · Encrypted at rest</p>
+          <p className="text-muted-foreground">
+            PDF or DOCX · Max 5MB · Extracted with Docling, analysed by LLMs
+          </p>
         </div>
 
-        {stage < 0 ? (
+        {phase === "idle" && (
           <label
             onDragOver={(e) => {
               e.preventDefault();
@@ -85,20 +165,63 @@ function UploadPage() {
               type="file"
               accept=".pdf,.docx"
               className="sr-only"
-              onChange={(e) => onFiles(e.target.files)}
+              onChange={(e) => {
+                onFiles(e.target.files);
+                e.target.value = "";
+              }}
             />
             <div className="relative p-16 text-center">
               <div className="size-16 rounded-2xl bg-accent/10 border border-accent/30 mx-auto mb-6 flex items-center justify-center">
                 <UploadCloud className="size-7 text-accent" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Drag & drop your resume</h2>
-              <p className="text-sm text-muted-foreground mb-6">or click to browse</p>
+              <h2 className="text-xl font-semibold mb-2">
+                Drag & drop your resume
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                or click to browse
+              </p>
               <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-accent-foreground rounded-lg font-semibold text-sm">
                 Choose file
               </span>
             </div>
           </label>
-        ) : (
+        )}
+
+        {phase === "error" && (
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-8">
+            <div className="flex items-start gap-3 mb-6">
+              <AlertCircle className="size-5 text-red-400 mt-0.5 shrink-0" />
+              <div>
+                <h2 className="text-sm font-semibold mb-1">
+                  We could not finish the analysis
+                </h2>
+                <p className="text-sm text-muted-foreground">{error}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {file && (
+                <button
+                  onClick={() => void startUpload(file)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-md text-sm font-semibold hover:brightness-110 transition-all"
+                >
+                  <RotateCcw className="size-4" />
+                  Retry
+                </button>
+              )}
+              <button
+                onClick={reset}
+                className="px-4 py-2 border border-border rounded-md text-sm hover:border-accent/40 transition-colors"
+              >
+                Choose another file
+              </button>
+            </div>
+            <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-widest mt-6">
+              Tip: make sure the AI Analyser service is running on port 8000.
+            </p>
+          </div>
+        )}
+
+        {phase === "working" && (
           <div className="rounded-2xl border border-border bg-panel p-10">
             <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
               <FileText className="size-5 text-accent" />
@@ -142,7 +265,9 @@ function UploadPage() {
                         <span className="size-2 rounded-full bg-accent animate-pulse" />
                       ) : null}
                     </div>
-                    <span className={`text-sm ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span
+                      className={`text-sm ${active ? "text-foreground" : "text-muted-foreground"}`}
+                    >
                       {label}
                     </span>
                     {active && (

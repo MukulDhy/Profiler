@@ -17,6 +17,9 @@ env/
 .env.*
 !.env.example
 
+# Uploaded / temporary resumes
+uploads/
+
 # Vector Database
 faiss_store/
 .pytest_cache/

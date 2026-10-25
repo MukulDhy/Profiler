@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Neural profile active. All data is mocked.
+              Neural profile active. Upload a resume to analyse it live.
             </p>
           </div>
         </div>
