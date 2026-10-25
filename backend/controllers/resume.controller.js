@@ -1,4 +1,5 @@
 import path from "path";
+import crypto from "crypto";
 import Upload from "../models/resume.model.js";
 import {
   downloadResumeToTemp,
@@ -237,12 +238,25 @@ export const getUserUploads = asyncHandler(async (req, res) => {
     Upload.countDocuments(filter),
   ]);
 
+  const mapped = uploads.map((upload) => ({
+    id: upload._id,
+    fileName: upload.fileName,
+    fileType: upload.fileType,
+    fileSize: upload.fileSize,
+    url: upload.url,
+    createdAt: upload.createdAt,
+    updatedAt: upload.updatedAt,
+    processingStatus: upload.processingStatus,
+    analysisMeta: upload.analysisMeta || null,
+    sharing: sharePayload(upload),
+  }));
+
   return respond(res, {
     httpCode: 200,
     status: "success",
     message: "Uploads fetched successfully.",
     data: {
-      uploads,
+      uploads: mapped,
       pagination: {
         total,
         page,
@@ -270,6 +284,17 @@ const profilePayload = (upload) => ({
   processingStatus: upload.processingStatus,
   profile: upload.profile || null,
   analysisMeta: upload.analysisMeta || null,
+  sharing: sharePayload(upload),
+});
+
+const shareUrlFor = (token) =>
+  `${(process.env.CLIENT_URL || "http://localhost:8080").replace(/\/+$/, "")}/share/${token}`;
+
+const sharePayload = (upload) => ({
+  isPublic: Boolean(upload?.isPublic && upload?.shareToken),
+  shareToken: upload?.isPublic ? upload.shareToken || null : null,
+  sharedAt: upload?.sharedAt || null,
+  url: upload?.isPublic && upload?.shareToken ? shareUrlFor(upload.shareToken) : null,
 });
 
 /**
@@ -601,3 +626,81 @@ export const updateProcessingStatus = asyncHandler(async (req, res) => {
     data: { upload },
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/resume/:id/share
+ * Publish a read-only public profile and return its share URL.
+ */
+export const shareResume = asyncHandler(async (req, res) => {
+  const upload = await Upload.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+    isDeleted: false,
+  });
+
+  if (!upload) {
+    return respond(res, {
+      httpCode: 404,
+      status: "error",
+      message: "Upload not found.",
+    });
+  }
+
+  if (upload.processingStatus !== "completed" || !upload.profile) {
+    return respond(res, {
+      httpCode: 409,
+      status: "error",
+      message: "This resume is still being analysed. Share it once it is ready.",
+    });
+  }
+
+  if (!upload.shareToken) {
+    upload.shareToken = crypto.randomBytes(18).toString("base64url");
+  }
+  upload.isPublic = true;
+  upload.sharedAt = new Date();
+  await upload.save();
+
+  return respond(res, {
+    httpCode: 200,
+    status: "success",
+    message: "Profile is now public.",
+    data: { sharing: sharePayload(upload) },
+  });
+});
+
+/**
+ * DELETE /api/resume/:id/share
+ * Revoke public access. The token is discarded so an old link cannot be
+ * re-enabled accidentally.
+ */
+export const revokeResumeShare = asyncHandler(async (req, res) => {
+  const upload = await Upload.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+    isDeleted: false,
+  });
+
+  if (!upload) {
+    return respond(res, {
+      httpCode: 404,
+      status: "error",
+      message: "Upload not found.",
+    });
+  }
+
+  upload.isPublic = false;
+  upload.sharedAt = null;
+  upload.shareToken = undefined;
+  await upload.save();
+
+  return respond(res, {
+    httpCode: 200,
+    status: "success",
+    message: "Public link revoked.",
+    data: { sharing: sharePayload(upload) },
+  });
+});
+

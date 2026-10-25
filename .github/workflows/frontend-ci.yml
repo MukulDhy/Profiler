@@ -19,10 +19,10 @@ jobs:
       # 1. Checkout code
       - uses: actions/checkout@v4
 
-      # 2. Setup Node.js (using 18 to match backend)
+      # 2. Setup Node.js (using 20)
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: "npm"
 
       # 3. Install dependencies

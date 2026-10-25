@@ -6,7 +6,9 @@ import {
   getUploadById,
   getUserUploads,
   reanalyzeUpload,
+  revokeResumeShare,
   saveAnalysis,
+  shareResume,
   updateProcessingStatus,
   uploadResumeController,
 } from "../controllers/resume.controller.js";
@@ -30,6 +32,9 @@ router.get("/:id", getUploadById);
 router.post("/:id/reanalyze", reanalyzeUpload);
 router.patch("/:id/analysis", saveAnalysis);
 router.patch("/:id/status", updateProcessingStatus);
+
+router.post("/:id/share", shareResume);
+router.delete("/:id/share", revokeResumeShare);
 
 router.delete("/:id", deleteUpload);
 

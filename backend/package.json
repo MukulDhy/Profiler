@@ -1,25 +1,28 @@
 {
-  "name": "ProFiller-mate-server",
+  "name": "profilegpt-server",
   "type": "module",
-  "version": "1.0.0",
-  "description": "Backend API for ProFiller mate server",
+  "version": "2.0.0",
+  "description": "Backend API for ProfileGPT — resume intelligence and recruiter chat",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "keywords": [
     "express",
     "mongodb",
-    "api",
-    "healthcare",
-    "device"
+    "resume",
+    "ai",
+    "recruiter"
   ],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
@@ -27,6 +30,7 @@
     "cloudinary": "^2.7.0",
     "colors": "^1.4.0",
     "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
@@ -37,18 +41,10 @@
     "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.8.7",
-    "mongoose-sequence": "^6.0.1",
     "morgan": "^1.10.0",
-    "mqtt": "^4.3.7",
     "multer": "^2.0.2",
-    "node-cron": "^4.2.1",
-    "node-schedule": "^2.1.1",
     "nodemailer": "^7.0.6",
-    "razorpay": "^2.9.6",
-    "socket.io": "^4.8.1",
-    "twilio": "^5.6.0",
-    "winston": "^3.8.2",
-    "ws": "^8.13.0"
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "jest": "^29.5.0",

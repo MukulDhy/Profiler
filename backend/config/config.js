@@ -26,7 +26,7 @@ const config = {
   // Environment
   JWT_COOKIE_EXPIRE: process.env.JWT_COOKIE_EXPIRE || 20,
   NODE_ENV: process.env.NODE_ENV || "development",
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:3000",
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:8080",
 
   // Database
   MONGO_URI:
@@ -37,21 +37,12 @@ const config = {
   JWT_EXPIRE: process.env.JWT_EXPIRE || "30d",
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || "your_refresh_secret",
 
-  // MQTT
-
   // Logging
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
 
   // Rate Limiting
   RATE_LIMIT_WINDOW: parseInt(process.env.RATE_LIMIT_WINDOW) || 900000, // 15 minutes
   RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX) || 100,
-
-  // WebSocket
-  WEBSOCKET_PATH: process.env.WEBSOCKET_PATH || "/ws",
-
-  // Notification
-  NOTIFICATION_CHECK_INTERVAL:
-    parseInt(process.env.NOTIFICATION_CHECK_INTERVAL) || 60000, // 1 minute
 
   // SMTP / Mail
   SMTP_HOST: process.env.SMTP_HOST || "smtp.gmail.com",

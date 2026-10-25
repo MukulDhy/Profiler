@@ -12,8 +12,11 @@ from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app.chat import answer_chat
 from app.graph import run_analysis
+from app.job_match import match_job
 from app.llm_router import get_router
+from app.schemas import ChatRequest, JobMatchRequest
 from config.settings import get_settings
 
 logging.basicConfig(
@@ -273,3 +276,52 @@ def analyze_url(
         )
     finally:
         _cleanup(path)
+
+
+@app.post("/api/v1/chat")
+def chat(
+    payload: ChatRequest,
+    x_service_token: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Answer a recruiter question grounded in the full candidate profile."""
+    _verify_service_token(x_service_token)
+
+    question = payload.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question is required.")
+
+    try:
+        result = answer_chat(payload)
+    except Exception as exc:  # noqa: BLE001 - surfaced to the backend
+        logger.exception("Chat failed")
+        raise HTTPException(status_code=500, detail=f"Chat failed: {exc}") from exc
+
+    return {
+        "status": "success",
+        "message": "Answer generated.",
+        "data": result.model_dump(),
+    }
+
+
+@app.post("/api/v1/job-match")
+def job_match(
+    payload: JobMatchRequest,
+    x_service_token: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Score a candidate profile against a job description."""
+    _verify_service_token(x_service_token)
+
+    try:
+        result = match_job(payload)
+    except Exception as exc:  # noqa: BLE001 - surfaced to the backend
+        logger.exception("Job match failed")
+        raise HTTPException(
+            status_code=500, detail=f"Job match failed: {exc}"
+        ) from exc
+
+    return {
+        "status": "success",
+        "message": "Job match generated.",
+        "data": result.model_dump(),
+    }
+

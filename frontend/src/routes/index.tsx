@@ -269,53 +269,55 @@ function Landing() {
           </div>
         </section>
 
-        {/* Pricing */}
-        <section id="pricing" className="py-24 px-6 max-w-7xl mx-auto border-t border-border">
-          <h2 className="text-4xl font-semibold tracking-tight text-center mb-4">
-            Simple, intelligent pricing.
-          </h2>
-          <p className="text-center text-muted-foreground mb-16">
-            Start free. Upgrade when recruiters start chatting.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: "Starter", price: "Free", body: "1 profile · 50 chat queries / mo", cta: "Begin" },
-              { name: "Pro", price: "$19", body: "Unlimited chats · custom domain · analytics", cta: "Upgrade", featured: true },
-              { name: "Teams", price: "$49", body: "Recruiter dashboards · 5 seats · SSO", cta: "Contact" },
-            ].map((t) => (
-              <div
-                key={t.name}
-                className={`p-8 rounded-xl border ${
-                  t.featured
-                    ? "border-accent/40 bg-accent/5 ring-1 ring-accent/20"
-                    : "border-border bg-panel"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold">{t.name}</h3>
-                  {t.featured && (
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-accent">
-                      Recommended
-                    </span>
-                  )}
+        {/* Free forever */}
+        <section id="free" className="py-24 px-6 max-w-7xl mx-auto border-t border-border">
+          <div className="max-w-3xl mx-auto text-center mb-14">
+            <h2 className="text-4xl font-semibold tracking-tight mb-4">
+              Free. Not free-trial.
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Every feature is available to every account. No plans, no seats, no
+              usage meters on the core experience.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto rounded-2xl border border-accent/40 bg-accent/5 ring-1 ring-accent/20 p-8 lg:p-10">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-accent mb-2">
+                  ProfileGPT Free
                 </div>
-                <div className="text-4xl font-semibold tracking-tight mb-2">
-                  {t.price}
-                  <span className="text-sm text-muted-foreground font-normal">/mo</span>
+                <div className="text-5xl font-semibold tracking-tighter">
+                  $0
+                  <span className="text-sm text-muted-foreground font-normal">
+                    {" "}
+                    / forever
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-8 leading-relaxed">{t.body}</p>
-                <Link
-                  to="/upload"
-                  className={`block text-center px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                    t.featured
-                      ? "bg-accent text-accent-foreground hover:brightness-110"
-                      : "border border-border hover:border-accent/40"
-                  }`}
-                >
-                  {t.cta}
-                </Link>
               </div>
-            ))}
+              <Link
+                to="/signup"
+                className="px-6 py-3 rounded-lg bg-accent text-accent-foreground text-sm font-semibold hover:brightness-110 transition-all"
+              >
+                Create free account
+              </Link>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                "Unlimited resume analyses",
+                "AI chat grounded in your full profile",
+                "Public share links you control",
+                "Recruiter notes and job-description matching",
+                "Live GitHub activity",
+                "Projects, role fit and interview questions",
+              ].map((feature) => (
+                <div key={feature} className="flex items-start gap-2 text-sm">
+                  <Zap className="size-3.5 text-accent mt-0.5 shrink-0" />
+                  {feature}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -324,9 +326,10 @@ function Landing() {
           <h2 className="text-3xl font-semibold tracking-tight mb-10">Frequently asked.</h2>
           <div className="space-y-3">
             {[
-              { q: "How private is my resume?", a: "Encrypted at rest. You control the share URL and can revoke anytime." },
-              { q: "Can recruiters export my data?", a: "No. The chat interface is read-only and instrumented for misuse." },
-              { q: "Does it work with DOCX?", a: "PDF, DOCX, and Markdown. We extract structure, not just text." },
+              { q: "Is ProfileGPT really free?", a: "Yes. There are no paid plans or feature gates. Upload, analyse, chat and share without paying." },
+              { q: "How private is my resume?", a: "You control the share link and can revoke it at any time. The resume file itself is never exposed on a public profile." },
+              { q: "Can recruiters export my data?", a: "No. The chat interface is read-only and rate-limited." },
+              { q: "Does it work with DOCX?", a: "PDF and DOCX are supported. We extract structure, not just plain text." },
               { q: "Do I need to write prompts?", a: "No. The model is grounded on your resume and answers in your voice." },
             ].map((f) => (
               <details

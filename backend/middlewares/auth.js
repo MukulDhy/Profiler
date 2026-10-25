@@ -7,11 +7,21 @@ const DEMO_PASSWORD = "Demo@12345";
 
 const demoModeEnabled = () => process.env.DEMO_MODE !== "false";
 
+const getTokenFromRequest = (req) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    return req.headers.authorization.split(" ")[1];
+  }
+  return req.cookies?.accessToken || req.cookies?.token;
+};
+
 /**
  * Returns (and creates on first use) the shared demo account. This lets the
  * upload → analysis pipeline work before real authentication ships.
  */
-const getDemoUser = async () => {
+export const getDemoUser = async () => {
   let user = await User.findOne({ email: DEMO_EMAIL });
 
   if (!user) {
@@ -36,47 +46,44 @@ const getDemoUser = async () => {
   return user;
 };
 
+const verifyToken = (token) =>
+  jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key_here");
+
 // Protect routes - verify JWT token, with a demo fallback for local use
 export const protect = async (req, res, next) => {
   try {
-    let token;
-
-    // Check for token in Authorization header
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    }
-    // Check for token in cookies (only if a cookie parser populated them)
-    else if (req.cookies?.token) {
-      token = req.cookies.token;
-    }
+    const token = getTokenFromRequest(req);
 
     if (token) {
       let decoded;
       try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-      } catch (error) {
+        decoded = verifyToken(token);
+      } catch {
         return res.status(401).json({
           success: false,
+          data: null,
           message: "Not authorized to access this route",
+          errorCode: 1008,
         });
       }
 
-      const user = await User.findById(decoded.id || decoded.userId);
+      const user = await User.findById(decoded.id || decoded.sub || decoded.userId);
 
       if (!user) {
         return res.status(401).json({
           success: false,
+          data: null,
           message: "No user found with this token",
+          errorCode: 1004,
         });
       }
 
       if (!user.isActive) {
         return res.status(401).json({
           success: false,
+          data: null,
           message: "User account has been deactivated",
+          errorCode: 1003,
         });
       }
 
@@ -87,18 +94,23 @@ export const protect = async (req, res, next) => {
     // No token → fall back to the shared demo account (unless disabled).
     if (demoModeEnabled()) {
       req.user = await getDemoUser();
+      req.isDemoAuth = true;
       return next();
     }
 
     return res.status(401).json({
       success: false,
+      data: null,
       message: "Not authorized to access this route",
+      errorCode: 1002,
     });
   } catch (error) {
     logger.error(`Auth middleware error: ${error.message}`);
     return res.status(500).json({
       success: false,
+      data: null,
       message: "Server error in authentication",
+      errorCode: 2001,
     });
   }
 };
@@ -109,19 +121,26 @@ export const authorize = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
+        data: null,
         message: `User role ${req.user.role} is not authorized to access this route`,
+        errorCode: 1003,
       });
     }
     next();
   };
 };
 
-// Check if user is email verified
+// Check if user is email verified (opt-in via env so local demo still works)
 export const requireEmailVerification = (req, res, next) => {
-  if (!req.user.isEmailVerified) {
+  if (
+    process.env.REQUIRE_EMAIL_VERIFICATION === "true" &&
+    !req.user.isEmailVerified
+  ) {
     return res.status(403).json({
       success: false,
+      data: null,
       message: "Please verify your email address to access this resource",
+      errorCode: 1003,
     });
   }
   next();
@@ -130,21 +149,14 @@ export const requireEmailVerification = (req, res, next) => {
 // Optional authentication - doesn't fail if no token
 export const optionalAuth = async (req, res, next) => {
   try {
-    let token;
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies?.token) {
-      token = req.cookies.token;
-    }
+    const token = getTokenFromRequest(req);
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id || decoded.userId);
+        const decoded = verifyToken(token);
+        const user = await User.findById(
+          decoded.id || decoded.sub || decoded.userId
+        );
         if (user && user.isActive) {
           req.user = user;
         }
@@ -167,7 +179,9 @@ export const adminSpecialAuth = async (req, res, next) => {
     if (!email) {
       return res.status(401).json({
         success: false,
+        data: null,
         message: "Unauthorized: Missing admin credentials",
+        errorCode: 1002,
       });
     }
 
@@ -176,7 +190,9 @@ export const adminSpecialAuth = async (req, res, next) => {
     if (!adminUser) {
       return res.status(401).json({
         success: false,
+        data: null,
         message: "Unauthorized: Invalid admin credentials",
+        errorCode: 1006,
       });
     }
 
@@ -186,7 +202,9 @@ export const adminSpecialAuth = async (req, res, next) => {
     logger.error(`Admin special auth middleware error: ${error.message}`);
     return res.status(500).json({
       success: false,
+      data: null,
       message: "Server error in admin authentication",
+      errorCode: 2001,
     });
   }
 };

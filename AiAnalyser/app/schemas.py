@@ -119,3 +119,49 @@ class ResumeProfile(StrictModel):
     platforms: list[Platform] = Field(default_factory=list)
     recruiterInsights: RecruiterInsights = Field(default_factory=RecruiterInsights)
     codingActivity: list[CodingActivity] = Field(default_factory=list)
+
+
+# ─── Chat ────────────────────────────────────────────────────────────────────
+
+
+class ChatMessage(StrictModel):
+    role: str = Field(default="user")
+    content: str = ""
+
+
+class ChatRequest(StrictModel):
+    profile: dict[str, Any] = Field(default_factory=dict)
+    extracted_text: str = ""
+    messages: list[ChatMessage] = Field(default_factory=list)
+    question: str = Field(min_length=1, max_length=4000)
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+
+class ChatResponse(StrictModel):
+    answer: str = ""
+    suggestions: list[str] = Field(default_factory=list)
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+
+# ─── Job description matching ────────────────────────────────────────────────
+
+
+class JobMatchRequest(StrictModel):
+    profile: dict[str, Any] = Field(default_factory=dict)
+    job_description: str = Field(min_length=20, max_length=20000)
+    provider: Optional[str] = None
+    model: Optional[str] = None
+
+
+class JobMatchResponse(StrictModel):
+    score: int = Field(default=0, ge=0, le=100)
+    matchedKeywords: list[str] = Field(default_factory=list)
+    missingKeywords: list[str] = Field(default_factory=list)
+    strengths: list[str] = Field(default_factory=list)
+    gaps: list[str] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list)
+    verdict: str = ""
+    provider: Optional[str] = None
+    model: Optional[str] = None
