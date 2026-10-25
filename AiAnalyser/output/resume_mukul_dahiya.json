@@ -1,0 +1,2221 @@
+{
+  "schema_name": "DoclingDocument",
+  "version": "1.10.0",
+  "name": "resume_mukul_dahiya",
+  "origin": {
+    "mimetype": "application/pdf",
+    "binary_hash": 6131296136092994779,
+    "filename": "resume_mukul_dahiya.pdf"
+  },
+  "furniture": {
+    "self_ref": "#/furniture",
+    "children": [],
+    "content_layer": "furniture",
+    "name": "_root_",
+    "label": "unspecified"
+  },
+  "body": {
+    "self_ref": "#/body",
+    "children": [
+      {
+        "$ref": "#/texts/0"
+      },
+      {
+        "$ref": "#/texts/1"
+      },
+      {
+        "$ref": "#/texts/2"
+      },
+      {
+        "$ref": "#/texts/3"
+      },
+      {
+        "$ref": "#/texts/4"
+      },
+      {
+        "$ref": "#/texts/5"
+      },
+      {
+        "$ref": "#/texts/6"
+      },
+      {
+        "$ref": "#/groups/0"
+      },
+      {
+        "$ref": "#/texts/8"
+      },
+      {
+        "$ref": "#/groups/1"
+      },
+      {
+        "$ref": "#/texts/10"
+      },
+      {
+        "$ref": "#/groups/2"
+      },
+      {
+        "$ref": "#/texts/12"
+      },
+      {
+        "$ref": "#/texts/13"
+      },
+      {
+        "$ref": "#/groups/3"
+      },
+      {
+        "$ref": "#/texts/15"
+      },
+      {
+        "$ref": "#/texts/16"
+      },
+      {
+        "$ref": "#/texts/17"
+      },
+      {
+        "$ref": "#/groups/4"
+      },
+      {
+        "$ref": "#/texts/19"
+      },
+      {
+        "$ref": "#/groups/5"
+      },
+      {
+        "$ref": "#/texts/21"
+      },
+      {
+        "$ref": "#/texts/22"
+      },
+      {
+        "$ref": "#/groups/6"
+      },
+      {
+        "$ref": "#/texts/24"
+      },
+      {
+        "$ref": "#/texts/25"
+      },
+      {
+        "$ref": "#/texts/26"
+      },
+      {
+        "$ref": "#/groups/7"
+      },
+      {
+        "$ref": "#/texts/28"
+      },
+      {
+        "$ref": "#/texts/29"
+      },
+      {
+        "$ref": "#/texts/30"
+      },
+      {
+        "$ref": "#/groups/8"
+      },
+      {
+        "$ref": "#/texts/32"
+      },
+      {
+        "$ref": "#/texts/33"
+      },
+      {
+        "$ref": "#/groups/9"
+      },
+      {
+        "$ref": "#/texts/35"
+      },
+      {
+        "$ref": "#/tables/0"
+      }
+    ],
+    "content_layer": "body",
+    "name": "_root_",
+    "label": "unspecified"
+  },
+  "groups": [
+    {
+      "self_ref": "#/groups/0",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/7"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/1",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/9"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/2",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/11"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/3",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/14"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/4",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/18"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/5",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/20"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/6",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/23"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/7",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/27"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/8",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/31"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    },
+    {
+      "self_ref": "#/groups/9",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [
+        {
+          "$ref": "#/texts/34"
+        }
+      ],
+      "content_layer": "body",
+      "name": "list",
+      "label": "list"
+    }
+  ],
+  "texts": [
+    {
+      "self_ref": "#/texts/0",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 231.7227534258849,
+            "t": 809.9189298272873,
+            "r": 364.51005815054776,
+            "b": 792.4796208932834,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            12
+          ]
+        }
+      ],
+      "orig": "Mukul Dahiya",
+      "text": "Mukul Dahiya",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/1",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 224.11892243546117,
+            "t": 783.9019003360008,
+            "r": 372.10974551652623,
+            "b": 775.185218935229,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            31
+          ]
+        }
+      ],
+      "orig": "Devops Engineer | Web Developer",
+      "text": "Devops Engineer | Web Developer"
+    },
+    {
+      "self_ref": "#/texts/2",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 63.85619629045004,
+            "t": 768.0537884834353,
+            "r": 532.3858427705072,
+            "b": 758.3791540434818,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            86
+          ]
+        }
+      ],
+      "orig": "+919999849790 \u25c7 1029mukul38@gmail.com \u25c7 Gurugram, Haryana, India \u25c7 LinkedIn \u25c7 LeetCode",
+      "text": "+919999849790 \u25c7 1029mukul38@gmail.com \u25c7 Gurugram, Haryana, India \u25c7 LinkedIn \u25c7 LeetCode",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/3",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 748.0976751318436,
+            "r": 84.0884524691221,
+            "b": 739.3809937310718,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            7
+          ]
+        }
+      ],
+      "orig": "SUMMARY",
+      "text": "SUMMARY",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/4",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 727.6381178723252,
+            "r": 565.8696560880018,
+            "b": 669.2339402698658,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            592
+          ]
+        }
+      ],
+      "orig": "DevOps Engineer and Full-Stack Web Developer with hands-on experience in building and deploying cloud-native applications using AWS, Docker, and Jenkins. Skilled in setting up CI/CD pipelines, infrastructure as code, monitoring with Prometheus and Grafana, and secure deployments using best practices. Also experienced in developing modern, responsive web applications using the MERN stack (MongoDB, Express.js, React.js, Node.js). Passionate about delivering scalable, efficient, and user-friendly solutions by combining DevOps automation with strong frontend and backend development skills.",
+      "text": "DevOps Engineer and Full-Stack Web Developer with hands-on experience in building and deploying cloud-native applications using AWS, Docker, and Jenkins. Skilled in setting up CI/CD pipelines, infrastructure as code, monitoring with Prometheus and Grafana, and secure deployments using best practices. Also experienced in developing modern, responsive web applications using the MERN stack (MongoDB, Express.js, React.js, Node.js). Passionate about delivering scalable, efficient, and user-friendly solutions by combining DevOps automation with strong frontend and backend development skills."
+    },
+    {
+      "self_ref": "#/texts/5",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 659.683159831782,
+            "r": 83.29326700365515,
+            "b": 650.96647843101,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            8
+          ]
+        }
+      ],
+      "orig": "PROJECTS",
+      "text": "PROJECTS",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/6",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 639.2236025722634,
+            "r": 110.58315590273604,
+            "b": 630.5069211714917,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            16
+          ]
+        }
+      ],
+      "orig": "GeoAnalyzer Link",
+      "text": "GeoAnalyzer Link",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/7",
+      "parent": {
+        "$ref": "#/groups/0"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 626.8017285218416,
+            "r": 557.1044035900202,
+            "b": 591.7799020731176,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            295
+          ]
+        }
+      ],
+      "orig": "Developed an innovative web and mobile application capable of analyzing and identifying lithology and geological discontinuities in drilled core samples. The application uses advanced image processing techniques to provide real-time analysis and mapping of predictions directly onto the samples.",
+      "text": "Developed an innovative web and mobile application capable of analyzing and identifying lithology and geological discontinuities in drilled core samples. The application uses advanced image processing techniques to provide real-time analysis and mapping of predictions directly onto the samples.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/8",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 585.1519155292506,
+            "r": 144.57205574014932,
+            "b": 576.4352341284787,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            23
+          ]
+        }
+      ],
+      "orig": "E-commerce website Link",
+      "text": "E-commerce website Link",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/9",
+      "parent": {
+        "$ref": "#/groups/1"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 572.7300414788286,
+            "r": 408.35581983412305,
+            "b": 564.0133600780568,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            86
+          ]
+        }
+      ],
+      "orig": "Web-based application that allows businesses to sell their products or services online",
+      "text": "Web-based application that allows businesses to sell their products or services online",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/10",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 556.6546750606356,
+            "r": 201.0070920050719,
+            "b": 547.9379936598638,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            33
+          ]
+        }
+      ],
+      "orig": "Attendance Management System Link",
+      "text": "Attendance Management System Link",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/11",
+      "parent": {
+        "$ref": "#/groups/2"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 544.2328010102137,
+            "r": 550.8606707428173,
+            "b": 509.9416730350439,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            256
+          ]
+        }
+      ],
+      "orig": "It is a web-based software application designed to help College to track the attendance of their students. The system is intended to automate and streamline attendance management processes, making it easier for administrators to monitor student attendance.",
+      "text": "It is a web-based software application designed to help College to track the attendance of their students. The system is intended to automate and streamline attendance management processes, making it easier for administrators to monitor student attendance.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/12",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 502.58298801762265,
+            "r": 329.7584501315493,
+            "b": 493.86630661685086,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            63
+          ]
+        }
+      ],
+      "orig": "TraveLove - Full-Stack Flight Booking Web App, Freelancing Link",
+      "text": "TraveLove - Full-Stack Flight Booking Web App, Freelancing Link",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/13",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 490.67544580880644,
+            "t": 502.58298801762265,
+            "r": 568.8892145177904,
+            "b": 493.86630661685086,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            17
+          ]
+        }
+      ],
+      "orig": "Dec '24 - Jan '25",
+      "text": "Dec '24 - Jan '25",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/14",
+      "parent": {
+        "$ref": "#/groups/3"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 490.1611139672008,
+            "r": 566.8517270025883,
+            "b": 455.8699859920309,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            322
+          ]
+        }
+      ],
+      "orig": "Developed a responsive full-stack flight booking platform using React.js, Node.js, and MongoDB with features like realtime flight search, filtering, and secure booking. Integrated DevOps practices by setting up CI/CD pipelines using GitHub Actions and Docker for automated deployment and streamlined development workflows.",
+      "text": "Developed a responsive full-stack flight booking platform using React.js, Node.js, and MongoDB with features like realtime flight search, filtering, and secure booking. Integrated DevOps practices by setting up CI/CD pipelines using GitHub Actions and Docker for automated deployment and streamlined development workflows.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/15",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 442.66571318617594,
+            "r": 403.7416705789149,
+            "b": 433.94903178540403,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            79
+          ]
+        }
+      ],
+      "orig": "Liver Biopsy Histopathological Image Analysis with Deep Learning, Sozo Lab Link",
+      "text": "Liver Biopsy Histopathological Image Analysis with Deep Learning, Sozo Lab Link",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/16",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 486.4967639131682,
+            "t": 449.241999448164,
+            "r": 568.8886236019349,
+            "b": 440.5253180473921,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            17
+          ]
+        }
+      ],
+      "orig": "Feb '25 - May '25",
+      "text": "Feb '25 - May '25",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/17",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 489.77348622702056,
+            "t": 436.82012539774206,
+            "r": 568.8918978617949,
+            "b": 428.1034439969702,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            17
+          ]
+        }
+      ],
+      "orig": "Kitakyushu, Japan",
+      "text": "Kitakyushu, Japan"
+    },
+    {
+      "self_ref": "#/texts/18",
+      "parent": {
+        "$ref": "#/groups/4"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 424.3982513473202,
+            "r": 546.2898896762102,
+            "b": 389.37642489859604,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            335
+          ]
+        }
+      ],
+      "orig": "Designed an AI-driven pipeline to analyze H&E-stained liver biopsy images, enabling automated detection of nuclei, nuclear glycogen, and pathological structures. Implemented traditional image processing and deep learning methods (CNN/UNet) with OpenCV and PyTorch, optimizing accuracy for medical image segmentation and quantification.",
+      "text": "Designed an AI-driven pipeline to analyze H&E-stained liver biopsy images, enabling automated detection of nuclei, nuclear glycogen, and pathological structures. Implemented traditional image processing and deep learning methods (CNN/UNet) with OpenCV and PyTorch, optimizing accuracy for medical image segmentation and quantification.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/19",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 382.74843835472916,
+            "r": 568.8917165055273,
+            "b": 374.03175695395726,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            80
+          ]
+        }
+      ],
+      "orig": "Smriti - Smart Wearable Reminder System for Alzheimer's Patients May '25 Present",
+      "text": "Smriti - Smart Wearable Reminder System for Alzheimer's Patients May '25 Present",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/20",
+      "parent": {
+        "$ref": "#/groups/5"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 370.3265643043072,
+            "r": 540.0360401309575,
+            "b": 322.88286380516126,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            363
+          ]
+        }
+      ],
+      "orig": "Engineered a full-stack IoT-based smart wearable using ESP32, LVGL, and React Native to provide medication reminders, GPS tracking, and fall detection for Alzheimer's patients. Integrated BLE/WiFi data sync with a Node.js backend and MongoDB, and used WebSockets for real-time alerts, with CI/CD pipelines and Docker for seamless firmware and backend deployments.",
+      "text": "Engineered a full-stack IoT-based smart wearable using ESP32, LVGL, and React Native to provide medication reminders, GPS tracking, and fall detection for Alzheimer's patients. Integrated BLE/WiFi data sync with a Node.js backend and MongoDB, and used WebSockets for real-time alerts, with CI/CD pipelines and Docker for seamless firmware and backend deployments.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/21",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 315.5241787877401,
+            "r": 242.41584231519943,
+            "b": 306.8074973869682,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            43
+          ]
+        }
+      ],
+      "orig": "Online Multiplayer Rock-Paper-Scissors Game",
+      "text": "Online Multiplayer Rock-Paper-Scissors Game",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/22",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 502.70913629515263,
+            "t": 315.5241787877401,
+            "r": 568.8847926990711,
+            "b": 306.8074973869682,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            15
+          ]
+        }
+      ],
+      "orig": "Apr '25 Present",
+      "text": "Apr '25 Present",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/23",
+      "parent": {
+        "$ref": "#/groups/6"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 303.10230473731815,
+            "r": 568.6244198399626,
+            "b": 268.8111767621483,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            282
+          ]
+        }
+      ],
+      "orig": "Built and deployed a real-time game on AWS using complete DevOps practices: Terraform for infrastructure, CI/CD with Jenkins, Dockerized microservices, Helm deployments on EKS, monitoring with Prometheus & Grafana, secrets managed in AWS Secrets Manager, and logging with ELK Stack.",
+      "text": "Built and deployed a real-time game on AWS using complete DevOps practices: Terraform for infrastructure, CI/CD with Jenkins, Dockerized microservices, Helm deployments on EKS, monitoring with Prometheus & Grafana, secrets managed in AWS Secrets Manager, and logging with ELK Stack.",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/24",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 259.26039632406446,
+            "r": 97.57437977607754,
+            "b": 250.54371492329255,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            10
+          ]
+        }
+      ],
+      "orig": "EXPERIENCE",
+      "text": "EXPERIENCE",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/25",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 238.80083906454604,
+            "r": 568.8957557305256,
+            "b": 230.08415766377414,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            45
+          ]
+        }
+      ],
+      "orig": "Full Stack Developer intern Feb '23 - Apr '23",
+      "text": "Full Stack Developer intern Feb '23 - Apr '23",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/26",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 226.3789650141241,
+            "r": 140.35852505707902,
+            "b": 217.6622836133522,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            24
+          ]
+        },
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 494.54586063242164,
+            "t": 226.3789650141241,
+            "r": 568.8846753507938,
+            "b": 217.6622836133522,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            25,
+            41
+          ]
+        }
+      ],
+      "orig": "Innomatics Research Labs Hyderabad, India",
+      "text": "Innomatics Research Labs Hyderabad, India"
+    },
+    {
+      "self_ref": "#/texts/27",
+      "parent": {
+        "$ref": "#/groups/7"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 213.95709096370229,
+            "r": 553.9510897401436,
+            "b": 178.93526451497814,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            245
+          ]
+        }
+      ],
+      "orig": "Achievements/Tasks Assisting with website development tasks such as coding, testing, and debugging. Participating in team meetings and project discussions. Learning and using web development technologies such as HTML, CSS, JavaScript, and jQuery",
+      "text": "Achievements/Tasks Assisting with website development tasks such as coding, testing, and debugging. Participating in team meetings and project discussions. Learning and using web development technologies such as HTML, CSS, JavaScript, and jQuery",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/28",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 172.30727797111115,
+            "r": 119.06553102814205,
+            "b": 163.59059657033924,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            18
+          ]
+        }
+      ],
+      "orig": "Frontend Developer",
+      "text": "Frontend Developer",
+      "level": 1
+    },
+    {
+      "self_ref": "#/texts/29",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 159.88540392068933,
+            "r": 116.5978741792744,
+            "b": 151.16872251991742,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            12
+          ]
+        }
+      ],
+      "orig": "LETSGROWMORE",
+      "text": "LETSGROWMORE"
+    },
+    {
+      "self_ref": "#/texts/30",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 494.81987256000446,
+            "t": 165.73099170912315,
+            "r": 568.8921543369592,
+            "b": 157.01431030835124,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            17
+          ]
+        }
+      ],
+      "orig": "Jul '23 - Jun '24",
+      "text": "Jul '23 - Jun '24"
+    },
+    {
+      "self_ref": "#/texts/31",
+      "parent": {
+        "$ref": "#/groups/8"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 147.4635298702674,
+            "r": 535.4871280293607,
+            "b": 125.59427594551937,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            119
+          ]
+        }
+      ],
+      "orig": "Achievements/Tasks Created Student Registration Enrollment Form and Result Portal with the help of Reactjs and Mongo Db",
+      "text": "Achievements/Tasks Created Student Registration Enrollment Form and Result Portal with the help of Reactjs and Mongo Db",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/32",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 118.96628940165249,
+            "r": 568.8957557305256,
+            "b": 70.06119195539793,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            200
+          ]
+        }
+      ],
+      "orig": "Data Scientist Intern MSTR Technologies Pvt Ltd Jul '24 - Dec '24 Gurugram, India Research AI Intern Graduate School of Life Science and Systems Engineering, Japan. Feb '25 - Apr '25 Kitakyushu, Japan",
+      "text": "Data Scientist Intern MSTR Technologies Pvt Ltd Jul '24 - Dec '24 Gurugram, India Research AI Intern Graduate School of Life Science and Systems Engineering, Japan. Feb '25 - Apr '25 Kitakyushu, Japan"
+    },
+    {
+      "self_ref": "#/texts/33",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "text",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 66.3559993057479,
+            "r": 72.54705583879732,
+            "b": 57.63931790497611,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            11
+          ]
+        }
+      ],
+      "orig": "Certificate",
+      "text": "Certificate",
+      "hyperlink": "https://drive.google.com/file/d/10Mux_0wu_pQp2gpOZkcg43vTyebZYdnN/view?usp=sharing"
+    },
+    {
+      "self_ref": "#/texts/34",
+      "parent": {
+        "$ref": "#/groups/9"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "list_item",
+      "prov": [
+        {
+          "page_no": 1,
+          "bbox": {
+            "l": 44.892287468987945,
+            "t": 53.93412525532597,
+            "r": 557.721429927567,
+            "b": 32.06487133057806,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            218
+          ]
+        }
+      ],
+      "orig": "To develop a robust and accurate computational approach for the detection and analysis of liver diseases using digitized histopathological (microscopic) images of liver tissues stained with Hematoxylin and Eosin (H&E).",
+      "text": "To develop a robust and accurate computational approach for the detection and analysis of liver diseases using digitized histopathological (microscopic) images of liver tissues stained with Hematoxylin and Eosin (H&E).",
+      "enumerated": false,
+      "marker": ""
+    },
+    {
+      "self_ref": "#/texts/35",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "section_header",
+      "prov": [
+        {
+          "page_no": 2,
+          "bbox": {
+            "l": 27.35552410368645,
+            "t": 806.5535779041809,
+            "r": 107.9745480354484,
+            "b": 797.8368965034091,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            15
+          ]
+        }
+      ],
+      "orig": "DevOps Engineer",
+      "text": "DevOps Engineer",
+      "level": 1
+    }
+  ],
+  "pictures": [],
+  "tables": [
+    {
+      "self_ref": "#/tables/0",
+      "parent": {
+        "$ref": "#/body"
+      },
+      "children": [],
+      "content_layer": "body",
+      "label": "document_index",
+      "prov": [
+        {
+          "page_no": 2,
+          "bbox": {
+            "l": 25.78488485576188,
+            "t": 803.3888750249731,
+            "r": 569.1633189721352,
+            "b": 339.2726855828698,
+            "coord_origin": "BOTTOMLEFT"
+          },
+          "charspan": [
+            0,
+            0
+          ]
+        }
+      ],
+      "captions": [],
+      "references": [],
+      "footnotes": [],
+      "data": {
+        "table_cells": [
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 47.788276146240946,
+              "r": 463.4045727343802,
+              "b": 169.76322094791828,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 0,
+            "end_row_offset_idx": 1,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Self-Initiated | Remote | Jan 2025 - Present Created end-to-end DevOps deployment of multiplayer game on AWS using IaC and CI/CD pipelines Set up Prometheus & Grafana for real-time monitoring and ELK for centralized logging Soft Skills Troubleshooting, Code Reviews, Adaptability, Problem-Solving, Team Collaboration,",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 454.43736838597636,
+              "t": 41.94268835780713,
+              "r": 568.8860079237026,
+              "b": 169.76322094791828,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 0,
+            "end_row_offset_idx": 1,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Jan '25 - Present Agile/Scrum, SOLID",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 90.89948608594045,
+              "r": 543.5547205902608,
+              "b": 157.34134689749635,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 2,
+            "start_row_offset_idx": 1,
+            "end_row_offset_idx": 2,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 2,
+            "text": "SKILLS Programming Languages C, Python, Java, JavaScript, SQL, C++, TypeScript , Data Structure, Algorithm, pandas Web Development HTML5, CSS, MERN Stack, React.js, React Native, MongoDB, Components, Data Management, Express, Redux, React Router, Responsive Design, RESTful APIs, WebSockets, NoSQL, Vue.js, Sql DevOps Containerization, Docker, CI/CD, EKS, AWS, Amazon S3, ELK Stack, Git, Github, Grafana, AWS IAM",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 173.46841359756843,
+              "r": 435.4441533151544,
+              "b": 273.52240419261886,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 3,
+            "end_row_offset_idx": 4,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Principles AI Data Science, Machine Learning, Deep Learning, Python, Matplotlib, Seaborn, MLOps Top 10% of all participants in Innomatics Full Stack Development Internship Assessment",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 198.31216169841207,
+              "r": 568.8942727779736,
+              "b": 258.1777362479801,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 2,
+            "start_row_offset_idx": 2,
+            "end_row_offset_idx": 3,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 2,
+            "text": "Languages English, Hindi, Japanese AWARDS Winner of SIH 2023 Ministry of Mines, Govt. of INDIA Jan '23",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 537.5086510981728,
+              "t": 264.80572279184696,
+              "r": 568.8901511270938,
+              "b": 273.52240419261886,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 4,
+            "end_row_offset_idx": 5,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Feb '23",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 280.15039073648575,
+              "r": 198.8259121235564,
+              "b": 307.1345339761134,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 4,
+            "end_row_offset_idx": 5,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Qualified 2 round of Flipkart gird 5.0 CERTIFICATIONS",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 318.87740983486003,
+              "r": 179.17909143312122,
+              "b": 327.5940912356317,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 2,
+            "start_row_offset_idx": 5,
+            "end_row_offset_idx": 6,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 2,
+            "text": "National Creativity Aptitude Test",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 334.2220777794988,
+              "r": 351.8509364098602,
+              "b": 342.9387591802705,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 6,
+            "end_row_offset_idx": 7,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Top 10% in Innomatics Full Stack Development Internship Assessment",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 537.5086510981728,
+              "t": 334.2220777794988,
+              "r": 568.8901511270938,
+              "b": 342.9387591802705,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 6,
+            "end_row_offset_idx": 7,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Feb '23",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 349.5667457241376,
+              "r": 485.753367617285,
+              "b": 373.6280950695483,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 2,
+            "start_row_offset_idx": 7,
+            "end_row_offset_idx": 8,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 2,
+            "text": "Achieved 2nd place in 'InnoSpark: Igniting Ideas for Tomorrow,' earning a certificate for excellence. Capture the Flag",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 380.2560816134152,
+              "r": 320.85845476802103,
+              "b": 404.31743095882587,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 2,
+            "start_row_offset_idx": 8,
+            "end_row_offset_idx": 9,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 2,
+            "text": "Intership Certificate Ai, Kyushu Institute of Technology (Kyutech) Introduction to DevOps, Great Learning",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 410.94541750269275,
+              "r": 447.5783939762587,
+              "b": 464.9654042638268,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 9,
+            "end_row_offset_idx": 10,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "DevOps and Software Engineering Certificate, IBM - In Progress EDUCATION B.Tech in Computer Science and Engineering, Dronacharya College of Engineering (GPA: 7.9)",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 488.8715339522194,
+              "t": 449.67243660106703,
+              "r": 568.8893594883675,
+              "b": 470.81099205226076,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 9,
+            "end_row_offset_idx": 10,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Nov '21 - Jun '25 Gurugram, India",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 477.43897859612764,
+              "r": 259.09656466765756,
+              "b": 486.15565999689954,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 10,
+            "end_row_offset_idx": 11,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Senior Secondary , Scr public school (GPA: 84.36%)",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 497.5143231812357,
+              "t": 477.43897859612764,
+              "r": 568.8882098123803,
+              "b": 486.15565999689954,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 10,
+            "end_row_offset_idx": 11,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Gurugram, India",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 27.35552410368645,
+              "t": 492.7836465407664,
+              "r": 308.93248399678583,
+              "b": 501.50032794153833,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 11,
+            "end_row_offset_idx": 12,
+            "start_col_offset_idx": 0,
+            "end_col_offset_idx": 1,
+            "text": "Matriculation, Our lady of Fatima convent school (GPA: 73.2%)",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          },
+          {
+            "bbox": {
+              "l": 497.5143231812357,
+              "t": 492.7836465407664,
+              "r": 568.8882098123803,
+              "b": 501.50032794153833,
+              "coord_origin": "TOPLEFT"
+            },
+            "row_span": 1,
+            "col_span": 1,
+            "start_row_offset_idx": 11,
+            "end_row_offset_idx": 12,
+            "start_col_offset_idx": 1,
+            "end_col_offset_idx": 2,
+            "text": "Gurugram, India",
+            "column_header": false,
+            "row_header": false,
+            "row_section": false,
+            "fillable": false
+          }
+        ],
+        "num_rows": 12,
+        "num_cols": 2,
+        "orientation": "rot_0",
+        "grid": [
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 47.788276146240946,
+                "r": 463.4045727343802,
+                "b": 169.76322094791828,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 0,
+              "end_row_offset_idx": 1,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Self-Initiated | Remote | Jan 2025 - Present Created end-to-end DevOps deployment of multiplayer game on AWS using IaC and CI/CD pipelines Set up Prometheus & Grafana for real-time monitoring and ELK for centralized logging Soft Skills Troubleshooting, Code Reviews, Adaptability, Problem-Solving, Team Collaboration,",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 454.43736838597636,
+                "t": 41.94268835780713,
+                "r": 568.8860079237026,
+                "b": 169.76322094791828,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 0,
+              "end_row_offset_idx": 1,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Jan '25 - Present Agile/Scrum, SOLID",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 90.89948608594045,
+                "r": 543.5547205902608,
+                "b": 157.34134689749635,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 1,
+              "end_row_offset_idx": 2,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "SKILLS Programming Languages C, Python, Java, JavaScript, SQL, C++, TypeScript , Data Structure, Algorithm, pandas Web Development HTML5, CSS, MERN Stack, React.js, React Native, MongoDB, Components, Data Management, Express, Redux, React Router, Responsive Design, RESTful APIs, WebSockets, NoSQL, Vue.js, Sql DevOps Containerization, Docker, CI/CD, EKS, AWS, Amazon S3, ELK Stack, Git, Github, Grafana, AWS IAM",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 90.89948608594045,
+                "r": 543.5547205902608,
+                "b": 157.34134689749635,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 1,
+              "end_row_offset_idx": 2,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "SKILLS Programming Languages C, Python, Java, JavaScript, SQL, C++, TypeScript , Data Structure, Algorithm, pandas Web Development HTML5, CSS, MERN Stack, React.js, React Native, MongoDB, Components, Data Management, Express, Redux, React Router, Responsive Design, RESTful APIs, WebSockets, NoSQL, Vue.js, Sql DevOps Containerization, Docker, CI/CD, EKS, AWS, Amazon S3, ELK Stack, Git, Github, Grafana, AWS IAM",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 198.31216169841207,
+                "r": 568.8942727779736,
+                "b": 258.1777362479801,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 2,
+              "end_row_offset_idx": 3,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Languages English, Hindi, Japanese AWARDS Winner of SIH 2023 Ministry of Mines, Govt. of INDIA Jan '23",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 198.31216169841207,
+                "r": 568.8942727779736,
+                "b": 258.1777362479801,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 2,
+              "end_row_offset_idx": 3,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Languages English, Hindi, Japanese AWARDS Winner of SIH 2023 Ministry of Mines, Govt. of INDIA Jan '23",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 173.46841359756843,
+                "r": 435.4441533151544,
+                "b": 273.52240419261886,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 3,
+              "end_row_offset_idx": 4,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Principles AI Data Science, Machine Learning, Deep Learning, Python, Matplotlib, Seaborn, MLOps Top 10% of all participants in Innomatics Full Stack Development Internship Assessment",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 3,
+              "end_row_offset_idx": 4,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 280.15039073648575,
+                "r": 198.8259121235564,
+                "b": 307.1345339761134,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 4,
+              "end_row_offset_idx": 5,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Qualified 2 round of Flipkart gird 5.0 CERTIFICATIONS",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 537.5086510981728,
+                "t": 264.80572279184696,
+                "r": 568.8901511270938,
+                "b": 273.52240419261886,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 4,
+              "end_row_offset_idx": 5,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Feb '23",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 318.87740983486003,
+                "r": 179.17909143312122,
+                "b": 327.5940912356317,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 5,
+              "end_row_offset_idx": 6,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "National Creativity Aptitude Test",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 318.87740983486003,
+                "r": 179.17909143312122,
+                "b": 327.5940912356317,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 5,
+              "end_row_offset_idx": 6,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "National Creativity Aptitude Test",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 334.2220777794988,
+                "r": 351.8509364098602,
+                "b": 342.9387591802705,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 6,
+              "end_row_offset_idx": 7,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Top 10% in Innomatics Full Stack Development Internship Assessment",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 537.5086510981728,
+                "t": 334.2220777794988,
+                "r": 568.8901511270938,
+                "b": 342.9387591802705,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 6,
+              "end_row_offset_idx": 7,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Feb '23",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 349.5667457241376,
+                "r": 485.753367617285,
+                "b": 373.6280950695483,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 7,
+              "end_row_offset_idx": 8,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Achieved 2nd place in 'InnoSpark: Igniting Ideas for Tomorrow,' earning a certificate for excellence. Capture the Flag",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 349.5667457241376,
+                "r": 485.753367617285,
+                "b": 373.6280950695483,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 7,
+              "end_row_offset_idx": 8,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Achieved 2nd place in 'InnoSpark: Igniting Ideas for Tomorrow,' earning a certificate for excellence. Capture the Flag",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 380.2560816134152,
+                "r": 320.85845476802103,
+                "b": 404.31743095882587,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 8,
+              "end_row_offset_idx": 9,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Intership Certificate Ai, Kyushu Institute of Technology (Kyutech) Introduction to DevOps, Great Learning",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 380.2560816134152,
+                "r": 320.85845476802103,
+                "b": 404.31743095882587,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 2,
+              "start_row_offset_idx": 8,
+              "end_row_offset_idx": 9,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 2,
+              "text": "Intership Certificate Ai, Kyushu Institute of Technology (Kyutech) Introduction to DevOps, Great Learning",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 410.94541750269275,
+                "r": 447.5783939762587,
+                "b": 464.9654042638268,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 9,
+              "end_row_offset_idx": 10,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "DevOps and Software Engineering Certificate, IBM - In Progress EDUCATION B.Tech in Computer Science and Engineering, Dronacharya College of Engineering (GPA: 7.9)",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 488.8715339522194,
+                "t": 449.67243660106703,
+                "r": 568.8893594883675,
+                "b": 470.81099205226076,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 9,
+              "end_row_offset_idx": 10,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Nov '21 - Jun '25 Gurugram, India",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 477.43897859612764,
+                "r": 259.09656466765756,
+                "b": 486.15565999689954,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 10,
+              "end_row_offset_idx": 11,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Senior Secondary , Scr public school (GPA: 84.36%)",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 497.5143231812357,
+                "t": 477.43897859612764,
+                "r": 568.8882098123803,
+                "b": 486.15565999689954,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 10,
+              "end_row_offset_idx": 11,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Gurugram, India",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ],
+          [
+            {
+              "bbox": {
+                "l": 27.35552410368645,
+                "t": 492.7836465407664,
+                "r": 308.93248399678583,
+                "b": 501.50032794153833,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 11,
+              "end_row_offset_idx": 12,
+              "start_col_offset_idx": 0,
+              "end_col_offset_idx": 1,
+              "text": "Matriculation, Our lady of Fatima convent school (GPA: 73.2%)",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            },
+            {
+              "bbox": {
+                "l": 497.5143231812357,
+                "t": 492.7836465407664,
+                "r": 568.8882098123803,
+                "b": 501.50032794153833,
+                "coord_origin": "TOPLEFT"
+              },
+              "row_span": 1,
+              "col_span": 1,
+              "start_row_offset_idx": 11,
+              "end_row_offset_idx": 12,
+              "start_col_offset_idx": 1,
+              "end_col_offset_idx": 2,
+              "text": "Gurugram, India",
+              "column_header": false,
+              "row_header": false,
+              "row_section": false,
+              "fillable": false
+            }
+          ]
+        ]
+      },
+      "annotations": []
+    }
+  ],
+  "key_value_items": [],
+  "form_items": [],
+  "pages": {
+    "1": {
+      "size": {
+        "width": 595.91998,
+        "height": 841.91998
+      },
+      "page_no": 1
+    },
+    "2": {
+      "size": {
+        "width": 595.91998,
+        "height": 841.91998
+      },
+      "page_no": 2
+    }
+  }
+}
