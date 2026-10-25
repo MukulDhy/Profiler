@@ -1,40 +1,24 @@
 import express from "express";
-// import {
-//   register,
-//   login,
-//   googleAuth,
-//   getMe,
-//   updateProfile,
-//   changePassword,
-//   forgotPassword,
-//   resetPassword,
-//   sendEmailVerification,
-//   verifyEmail,
-//   logout,
-//   deactivateAccount,
-//   verifyingProfile,
-//   verifyOtp,
-//   uploadAvatar,
-//   removeAvatar,
-//   updateSocialLinks,
-// } from "../controllers/auth.controller.js";
+import { register, login } from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/auth.js";
 import { validateRegistration, validateLogin } from "../utils/validators.js";
 
 const router = express.Router();
 
-// Public routes
-// router.post("/register", validateRegistration, register);
-// router.post("/login", validateLogin, login);
+// ─── Public routes ────────────────────────────────────────────────────────────
+router.post("/register", validateRegistration, register);
+router.post("/login", validateLogin, login);
+
 // router.post("/google", googleAuth);
 // router.post("/forgot-password", forgotPassword);
 // router.post("/verify-otp", verifyOtp);
 // router.post("/reset-password", resetPassword);
 // router.put("/reset-password/:token", resetPassword);
-
 // router.get("/verify-email/:token", verifyEmail);
-// Protected routes (require authentication)
-router.use(protect); // All routes after this middleware require authentication
+
+// ─── Protected routes (require authentication) ────────────────────────────────
+router.use(protect);
+
 // router.get("/verify", verifyingProfile);
 // router.get("/me", getMe);
 // router.put("/profile", updateProfile);

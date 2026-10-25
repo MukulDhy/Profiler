@@ -37,11 +37,13 @@ const getDemoUser = async () => {
 };
 
 // Protect routes - verify JWT token, with a demo fallback for local use
+
+// ─── Protect routes ───────────────────────────────────────────────────────────
+
 export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -103,7 +105,8 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// Grant access to specific roles
+// ─── Grant access to specific roles ──────────────────────────────────────────
+
 export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -116,7 +119,8 @@ export const authorize = (...roles) => {
   };
 };
 
-// Check if user is email verified
+// ─── Require email verification ───────────────────────────────────────────────
+
 export const requireEmailVerification = (req, res, next) => {
   if (!req.user.isEmailVerified) {
     return res.status(403).json({
@@ -127,7 +131,8 @@ export const requireEmailVerification = (req, res, next) => {
   next();
 };
 
-// Optional authentication - doesn't fail if no token
+// ─── Optional auth ────────────────────────────────────────────────────────────
+
 export const optionalAuth = async (req, res, next) => {
   try {
     let token;
@@ -159,6 +164,8 @@ export const optionalAuth = async (req, res, next) => {
     next();
   }
 };
+
+// ─── Admin special auth ───────────────────────────────────────────────────────
 
 export const adminSpecialAuth = async (req, res, next) => {
   try {
