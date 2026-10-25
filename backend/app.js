@@ -12,7 +12,7 @@ import compression from "compression";
 import errorHandler from "./middlewares/error.js";
 import authRouter from "./routes/auth.routes.js";
 import resumeRouter from "./routes/resume.routes.js";
-import {redis,RedisConnection} from "./scale/redis.js";
+// import {redis,RedisConnection} from "./scale/redis.js";
 // import webSocketService from "./services/websocket.service.js";
 // import ProFillerathonRouter from "./routes/ProFillerthon.routes.js";
 
@@ -44,7 +44,7 @@ app.use(morgan("combined", { stream: logger.stream }));
 app.use(express.static(path.join(__dirname, "public")));
 
 
-RedisConnection(); 
+// RedisConnection(); 
 
 // Routes
 app.get("/", (req, res) => {
@@ -69,6 +69,10 @@ app.use((req, res, next) => {
     errorCode: 3, // NOT_FOUND
   });
 });
+
+
+// // ── Attach Socket.IO ──────────────────────────
+// initSocket(server);
 
 // Error handler middleware
 app.use(errorHandler);

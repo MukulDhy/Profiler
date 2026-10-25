@@ -1,6 +1,6 @@
 import {redis} from "./redis.js";
 
-const setCache = async (key, value, ttl = 3600) => {
+const setCache = async (key, value, ttl = 6000) => {
     try {
         await redis.set(key, JSON.stringify(value), "EX", ttl);
     } catch (error) {
