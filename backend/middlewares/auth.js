@@ -1,23 +1,21 @@
 ﻿import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
 
-// Protect routes - verify JWT token
+// ─── Protect routes ───────────────────────────────────────────────────────────
+
 export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-    }
-    // Check for token in cookies
-    else if (req.cookies.token) {
+    } else if (req.cookies.token) {
       token = req.cookies.token;
     }
 
-    // Make sure token exists
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -26,12 +24,8 @@ export const protect = async (req, res, next) => {
     }
 
     try {
-      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Get user from token
-      let user;
-      // const user = await User.findById(decoded.id);
+      const user = await User.findById(decoded.sub);
 
       if (!user) {
         return res.status(401).json({
@@ -40,7 +34,6 @@ export const protect = async (req, res, next) => {
         });
       }
 
-      // Check if user is active
       if (!user.isActive) {
         return res.status(401).json({
           success: false,
@@ -65,7 +58,8 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// Grant access to specific roles
+// ─── Grant access to specific roles ──────────────────────────────────────────
+
 export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -78,7 +72,8 @@ export const authorize = (...roles) => {
   };
 };
 
-// Check if user is email verified
+// ─── Require email verification ───────────────────────────────────────────────
+
 export const requireEmailVerification = (req, res, next) => {
   if (!req.user.isEmailVerified) {
     return res.status(403).json({
@@ -89,37 +84,27 @@ export const requireEmailVerification = (req, res, next) => {
   next();
 };
 
-// Optional authentication - doesn't fail if no token
+// ─── Optional auth ────────────────────────────────────────────────────────────
+
 export const optionalAuth = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
-    }
-    // Check for token in cookies
-    else if (req.cookies.token) {
+    } else if (req.cookies.token) {
       token = req.cookies.token;
     }
 
     if (token) {
       try {
-        // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Get user from token
-        let user;
-        // const user = await User.findById(decoded.userId);
-
-        if (user && user.isActive) {
-          req.user = user;
-        }
-      } catch (error) {
-        // Token is invalid, but we don't fail - just continue without user
+        const user = await User.findById(decoded.sub);
+        if (user && user.isActive) req.user = user;
+      } catch {
         console.log("Invalid token in optional auth");
       }
     }
@@ -131,9 +116,11 @@ export const optionalAuth = async (req, res, next) => {
   }
 };
 
+// ─── Admin special auth ───────────────────────────────────────────────────────
+
 export const adminSpecialAuth = async (req, res, next) => {
   try {
-    let email = req.headers["x-admin-email"];
+    const email = req.headers["x-admin-email"];
 
     if (!email) {
       return res.status(401).json({
@@ -141,8 +128,8 @@ export const adminSpecialAuth = async (req, res, next) => {
         message: "Unauthorized: Missing admin credentials",
       });
     }
-    let adminUser;
-    // const adminUser = await User.findOne({ email: email, role: "admin" });
+
+    const adminUser = await User.findOne({ email, role: "admin" });
 
     if (!adminUser) {
       return res.status(401).json({

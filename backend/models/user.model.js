@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
-const { Schema } = mongoose;
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -16,23 +17,22 @@ const userSchema = new mongoose.Schema(
       ],
       maxlength: [100, "Email cannot exceed 100 characters"],
     },
-    location: {
+
+    name: {
       type: String,
+      required: [true, "Name is required"],
       trim: true,
-      maxlength: [100, "Location cannot exceed 100 characters"],
+      minlength: [2, "Name must be at least 2 characters long"],
+      maxlength: [50, "Name cannot exceed 50 characters"],
     },
-    username: {
-      type: String,
-      trim: true,
-      maxlength: [15, "username not exceed 100 characters"],
-    },
+
     password: {
       type: String,
       required: [true, "Password is required"],
       minlength: [8, "Password must be at least 8 characters long"],
+      select: false, // ✅ exclude from queries by default
       validate: {
         validator: function (password) {
-          // At least one uppercase, one lowercase, one number, one special character
           return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
             password
           );
@@ -42,23 +42,40 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    name: {
+    // Added userType field (was missing — caused test failures)
+    // userType: {
+    //   type: String,
+    //   required: [true, "User type is required"],
+    //   enum: {
+    //     values: ["patient", "caregiver", "doctor"],
+    //     message: "userType must be patient, caregiver, or doctor",
+    //   },
+    // },
+
+    role: {
       type: String,
-      required: [true, "Name is required"],
-      trim: true,
-      minlength: [2, "Name must be at least 2 characters long"],
-      maxlength: [50, "Name cannot exceed 50 characters"],
-      // match: [/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"],
+      required: true,
+      default: "user",
     },
 
-   
+    location: {
+      type: String,
+      trim: true,
+      maxlength: [100, "Location cannot exceed 100 characters"],
+    },
+
+    username: {
+      type: String,
+      trim: true,
+      maxlength: [15, "Username cannot exceed 15 characters"],
+    },
+
     phone: {
       type: String,
       trim: true,
       validate: {
         validator: function (phone) {
-          if (!phone) return true; // Optional field
-          // Supports various international formats
+          if (!phone) return true;
           return /^[\+]?[1-9][\d]{0,15}$/.test(
             phone.replace(/[\s\-\(\)\.]/g, "")
           );
@@ -66,7 +83,7 @@ const userSchema = new mongoose.Schema(
         message: "Please provide a valid phone number",
       },
     },
-  
+
     profilePicture: {
       type: String,
       default:
@@ -74,11 +91,16 @@ const userSchema = new mongoose.Schema(
       validate: {
         validator: function (url) {
           if (!url || url === "default-avatar.png") return true;
-          // Allow any valid https URL (Google photos, CDN links, etc.)
           return /^https?:\/\/[^\s]+$/.test(url);
         },
         message: "Please provide a valid image URL",
       },
+    },
+
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 500,
     },
 
     isEmailVerified: {
@@ -94,105 +116,84 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
-    role: {
-      type: String,
-      required: true,
-      default: "user",
-    },
-    bio: {
-      type: String,
-      trim: true,
-      maxlength: 500,
-    },
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    refreshToken: String,
   },
   {
     timestamps: true,
+    // Merged into one toJSON block — fixes the overwrite bug
     toJSON: {
+      virtuals: true,
       transform: function (doc, ret) {
         delete ret.password;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpires;
+        delete ret.refreshToken; 
         return ret;
       },
+    },
+    toObject: {
+      virtuals: true,
     },
   }
 );
 
-// Indexes for better query performance
+// Indexes
 userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
-userSchema.index({ skills: 1 });
-userSchema.index({ experience: 1 });
 
-// Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
-  // Only hash the password if it has been modified (or is new)
   if (!this.isModified("password")) return next();
-
   try {
-    // Hash password with cost of 12
-    const hashedPassword = await bcrypt.hash(this.password, 12);
-    this.password = hashedPassword;
+    const saltRounds = process.env.NODE_ENV === "test" ? 4 : 12;
+    this.password = await bcrypt.hash(this.password, saltRounds);
     next();
   } catch (error) {
     next(error);
   }
 });
 
-// Instance method to check password
+// Compare password for login
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Instance method to generate password reset token (fixed)
-userSchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
-
-  this.resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-  return resetToken;
-};
-
-// Instance method to generate JWT token (missing)
+// Generate JWT token
 userSchema.methods.generateToken = function () {
   return jwt.sign(
-    {
-      id: this._id,
-      email: this.email,
-    },
+    { id: this._id, email: this.email },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || "7d" }
   );
 };
 
-// Virtual for full profile completion percentage
-userSchema.virtual("profileCompletion").get(function () {
-  const fields = [
-    "name",
-    "email",
-    "age",
-    "phone",
-    "profilePicture",
-  ];
-  const filledFields = fields.filter((field) => {
-    if (field === "skills") return this[field] && this[field].length > 0;
-    if (field === "profilePicture")
-      return this[field] && this[field] !== "default-avatar.png";
-    return this[field];
-  });
+// Generate password reset token
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  return resetToken;
+};
 
+// Virtual: profile completion percentage
+userSchema.virtual("profileCompletion").get(function () {
+  const fields = ["name", "email", "phone", "profilePicture", "bio"];
+  const filledFields = fields.filter((field) => {
+    if (field === "profilePicture")
+      return (
+        this[field] &&
+        this[field] !==
+          "https://static.vecteezy.com/system/resources/previews/054/078/735/non_2x/gamer-avatar-with-headphones-and-controller-vector.jpg"
+      );
+    return !!this[field];
+  });
   return Math.round((filledFields.length / fields.length) * 100);
 });
-
-// Ensure virtual fields are serialized
-userSchema.set("toJSON", { virtuals: true });
 
 const User = mongoose.model("User", userSchema);
 export default User;

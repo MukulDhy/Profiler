@@ -1,5 +1,9 @@
 import cron from "node-cron";
 import mongoose from "mongoose";
+//import { sendTeamNotification } from "../services/sendTeamEmail.service.js";
+// import Inflioathon from "../models/Infliothon.model.js";
+// import Team from "../models/team.model.js";
+// import TeamMember from "../models/teamMember.model.js";
 import User from "../models/user.model.js";
 import logger from "./logger.js";
 
@@ -64,7 +68,7 @@ const classifyError = (error) => {
     error.message.includes("No participants") ||
     error.message.includes("No problem statements") ||
     error.message.includes("Not enough participants") ||
-    error.message.includes("ProFillerathon already started")
+    error.message.includes("Inflioathon already started")
   ) {
     return new SchedulerError(
       error.message,
@@ -110,23 +114,23 @@ const retryOperation = async (operation, maxRetries = 3, baseDelay = 500) => {
   throw lastError;
 };
 
-// Function to cancel ProFillerathon and cleanup (standalone function with its own session)
-const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues", io) => {
+// Function to cancel Inflioathon and cleanup (standalone function with its own session)
+const cancelInflioathon = async (Inflioathon, reason = "Technical issues", io) => {
   const session = await mongoose.startSession();
 
   try {
     await session.startTransaction();
 
-    const { _id, title, participants } = ProFillerathon;
+    const { _id, title, participants } = Inflioathon;
 
-    logger.info(`Cancelling ProFillerathon: ${title}`, {
-      ProFillerathonId: _id,
+    logger.info(`Cancelling Inflioathon: ${title}`, {
+      InflioathonId: _id,
       reason,
       participantCount: participants?.length || 0,
     });
 
-    // Update ProFillerathon status to cancelled
-    await ProFillerathon.findByIdAndUpdate(
+    // Update Inflioathon status to cancelled
+    await Inflioathon.findByIdAndUpdate(
       _id,
       {
         $set: {
@@ -138,13 +142,13 @@ const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues",
       { session }
     );
 
-    // Clear currentProFillerathonId for all participants
+    // Clear currentInflioathonId for all participants
     if (participants && participants.length > 0) {
       const userUpdatePromises = participants.map((participantId) =>
         User.findByIdAndUpdate(
           participantId,
           {
-            $unset: { currentProFillerathonId: null },
+            $unset: { currentInflioathonId: null },
           },
           { session }
         )
@@ -152,20 +156,20 @@ const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues",
 
       await Promise.all(userUpdatePromises);
       logger.info(
-        `Cleared currentProFillerathonId for ${participants.length} participants`
+        `Cleared currentInflioathonId for ${participants.length} participants`
       );
     }
 
-    // Delete any teams that were created for this ProFillerathon
+    // Delete any teams that were created for this Inflioathon
     const teamsDeleted = await Team.deleteMany(
-      { ProFillerathonId: _id },
+      { InflioathonId: _id },
       { session }
     );
 
     // Delete team members associated with those teams
     if (teamsDeleted.deletedCount > 0) {
       const teamIds = (
-        await Team.find({ ProFillerathonId: _id }).session(session)
+        await Team.find({ InflioathonId: _id }).session(session)
       ).map((team) => team._id);
       await TeamMember.deleteMany({ teamId: { $in: teamIds } }, { session });
       logger.info(
@@ -175,17 +179,17 @@ const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues",
 
     await session.commitTransaction();
 
-    logger.info(`Successfully cancelled ProFillerathon: ${title}`, {
-      ProFillerathonId: _id,
+    logger.info(`Successfully cancelled Inflioathon: ${title}`, {
+      InflioathonId: _id,
       participantsCleared: participants?.length || 0,
       teamsDeleted: teamsDeleted.deletedCount || 0,
     });
 
-    // Notify clients about ProFillerathon cancellation
+    // Notify clients about Inflioathon cancellation
     if (io) {
-      io.to(_id.toString()).emit("ProFillerathon-cancelled", {
-        ProFillerathonId: _id,
-        ProFillerathonTitle: title,
+      io.to(_id.toString()).emit("Inflioathon-cancelled", {
+        InflioathonId: _id,
+        InflioathonTitle: title,
         reason: reason,
         cancelledAt: new Date().toISOString(),
       });
@@ -193,15 +197,15 @@ const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues",
 
     return {
       success: true,
-      ProFillerathonId: _id,
-      ProFillerathonTitle: title,
+      InflioathonId: _id,
+      InflioathonTitle: title,
       participantsCleared: participants?.length || 0,
       teamsDeleted: teamsDeleted.deletedCount || 0,
       reason: reason,
     };
   } catch (error) {
     await session.abortTransaction();
-    logger.error(`Failed to cancel ProFillerathon ${ProFillerathon.title}:`, error);
+    logger.error(`Failed to cancel Inflioathon ${Inflioathon.title}:`, error);
     throw error;
   } finally {
     session.endSession();
@@ -209,7 +213,7 @@ const cancelProFillerathon = async (ProFillerathon, reason = "Technical issues",
 };
 
 // Team creation logic with proper transaction handling and cancellation on failure
-const createTeamsForProFillerathon = async (ProFillerathon, io) => {
+const createTeamsForInflioathon = async (Inflioathon, io) => {
   const session = await mongoose.startSession();
   let transactionCommitted = false;
 
@@ -223,11 +227,11 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
       minParticipantsToFormTeam,
       _id,
       title,
-    } = ProFillerathon;
+    } = Inflioathon;
 
-    // Validation checks - throw errors instead of calling cancelProFillerathon here
+    // Validation checks - throw errors instead of calling cancelInflioathon here
     if (!participants || participants.length === 0) {
-      const errorMsg = `No participants for ProFillerathon: ${title}`;
+      const errorMsg = `No participants for Inflioathon: ${title}`;
       logger.warn(errorMsg);
       throw new SchedulerError(
         errorMsg,
@@ -238,7 +242,7 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
     }
 
     if (!problemStatements || problemStatements.length === 0) {
-      const errorMsg = `No problem statements for ProFillerathon: ${title}`;
+      const errorMsg = `No problem statements for Inflioathon: ${title}`;
       logger.warn(errorMsg);
       throw new SchedulerError(
         errorMsg,
@@ -259,15 +263,15 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
       );
     }
 
-    // Check if ProFillerathon has already started
+    // Check if Inflioathon has already started
     const now = new Date();
-    if (ProFillerathon.startDate <= now) {
-      const errorMsg = `ProFillerathon ${title} has already started. Cannot form teams.`;
+    if (Inflioathon.startDate <= now) {
+      const errorMsg = `Inflioathon ${title} has already started. Cannot form teams.`;
       logger.error(errorMsg);
       throw new SchedulerError(
         errorMsg,
         ErrorTypes.BUSINESS,
-        "ProFillerATHON_STARTED",
+        "InflioATHON_STARTED",
         false
       );
     }
@@ -278,7 +282,7 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
     const baseTeamSize = Math.floor(totalParticipants / optimalTeamCount);
     const remainder = totalParticipants % optimalTeamCount;
 
-    logger.info(`Creating teams for ProFillerathon: ${title}`, {
+    logger.info(`Creating teams for Inflioathon: ${title}`, {
       totalParticipants,
       optimalTeamCount,
       baseTeamSize,
@@ -330,7 +334,7 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
       const team = await Team.create(
         [
           {
-            ProFillerathonId: _id,
+            InflioathonId: _id,
             name: teamName,
             problemStatement: randomProblem,
             submissionStatus: "not_submitted",
@@ -357,11 +361,11 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
         );
       });
 
-      // Update users' current ProFillerathon
+      // Update users' current Inflioathon
       const userUpdatePromises = teamMembers.map((memberId) =>
         User.findByIdAndUpdate(
           memberId,
-          { currentProFillerathonId: _id },
+          { currentInflioathonId: _id },
           { session }
         )
       );
@@ -399,24 +403,24 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
 
         const teammateNames = await Promise.all(teammates);
 
-        emailPromises.push(
-          sendTeamNotification({
-            email: user.email,
-            name: user.name,
-            ProFillerathonTitle: title,
-            teammates: teammateNames,
-            problemStatement: randomProblem,
-            teamName: teamName,
-          }).catch((emailError) => {
-            logger.error(`Failed to send email to ${user.email}:`, emailError);
-            return null;
-          })
-        );
+        // emailPromises.push(
+        //   sendTeamNotification({
+        //     email: user.email,
+        //     name: user.name,
+        //     InflioathonTitle: title,
+        //     teammates: teammateNames,
+        //     problemStatement: randomProblem,
+        //     teamName: teamName,
+        //   }).catch((emailError) => {
+        //     logger.error(`Failed to send email to ${user.email}:`, emailError);
+        //     return null;
+        //   })
+        // );
       }
     }
 
-    // Update ProFillerathon status
-    await ProFillerathon.findByIdAndUpdate(
+    // Update Inflioathon status
+    await Inflioathon.findByIdAndUpdate(
       _id,
       {
         $set: {
@@ -428,7 +432,7 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
 
     await session.commitTransaction();
     transactionCommitted = true;
-    logger.info(`Transaction committed successfully for ProFillerathon: ${title}`);
+    logger.info(`Transaction committed successfully for Inflioathon: ${title}`);
 
     // Send emails outside transaction
     if (emailPromises.length > 0) {
@@ -459,8 +463,8 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
     return {
       success: true,
       teamsCreated: createdTeams.length,
-      ProFillerathonId: _id,
-      ProFillerathonTitle: title,
+      InflioathonId: _id,
+      InflioathonTitle: title,
     };
   } catch (error) {
     // Only abort transaction if it hasn't been committed
@@ -472,16 +476,16 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
       }
     }
 
-    // If team formation fails due to business rules and ProFillerathon hasn't started, cancel it
+    // If team formation fails due to business rules and Inflioathon hasn't started, cancel it
     const now = new Date();
-    if (ProFillerathon.startDate > now && error.type === ErrorTypes.BUSINESS) {
+    if (Inflioathon.startDate > now && error.type === ErrorTypes.BUSINESS) {
       logger.warn(
-        `Team formation failed for ProFillerathon ${ProFillerathon.title} due to business rules, cancelling ProFillerathon: ${error.message}`
+        `Team formation failed for Inflioathon ${Inflioathon.title} due to business rules, cancelling Inflioathon: ${error.message}`
       );
       try {
         // Use a separate session for cancellation
-        await cancelProFillerathon(
-          ProFillerathon,
+        await cancelInflioathon(
+          Inflioathon,
           `Team formation failed: ${error.message}`,
           io
         );
@@ -490,14 +494,14 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
         return {
           success: true,
           teamsCreated: 0,
-          ProFillerathonId: ProFillerathon._id,
-          ProFillerathonTitle: ProFillerathon.title,
+          InflioathonId: Inflioathon._id,
+          InflioathonTitle: Inflioathon.title,
           cancelled: true,
           reason: error.message,
         };
       } catch (cancelError) {
         logger.error(
-          `Failed to cancel ProFillerathon after team formation failure:`,
+          `Failed to cancel Inflioathon after team formation failure:`,
           cancelError
         );
         // Re-throw the original business error, not the cancellation error
@@ -505,7 +509,7 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
       }
     } else if (error.type === ErrorTypes.FATAL) {
       logger.error(
-        `Fatal error during team formation for ProFillerathon ${ProFillerathon.title}:`,
+        `Fatal error during team formation for Inflioathon ${Inflioathon.title}:`,
         error
       );
     }
@@ -520,22 +524,22 @@ const createTeamsForProFillerathon = async (ProFillerathon, io) => {
   }
 };
 
-// Function to complete ProFillerathon and perform cleanup
-const completeProFillerathon = async (ProFillerathon, io) => {
+// Function to complete Inflioathon and perform cleanup
+const completeInflioathon = async (Inflioathon, io) => {
   const session = await mongoose.startSession();
 
   try {
     await session.startTransaction();
 
-    const { _id, title, status, participants } = ProFillerathon;
+    const { _id, title, status, participants } = Inflioathon;
 
-    logger.info(`Completing ProFillerathon: ${title}`, {
-      ProFillerathonId: _id,
+    logger.info(`Completing Inflioathon: ${title}`, {
+      InflioathonId: _id,
       currentStatus: status,
     });
 
-    // Update ProFillerathon status to completed
-    await ProFillerathon.findByIdAndUpdate(
+    // Update Inflioathon status to completed
+    await Inflioathon.findByIdAndUpdate(
       _id,
       {
         $set: {
@@ -546,10 +550,10 @@ const completeProFillerathon = async (ProFillerathon, io) => {
       { session }
     );
 
-    // Find all teams for this ProFillerathon
-    const teams = await Team.find({ ProFillerathonId: _id }).session(session);
+    // Find all teams for this Inflioathon
+    const teams = await Team.find({ InflioathonId: _id }).session(session);
     logger.info(
-      `Found ${teams.length} teams to process for ProFillerathon: ${title}`
+      `Found ${teams.length} teams to process for Inflioathon: ${title}`
     );
 
     // Update team statuses to completed
@@ -565,12 +569,12 @@ const completeProFillerathon = async (ProFillerathon, io) => {
       )
     );
 
-    // Clear currentProFillerathonId for all participants
+    // Clear currentInflioathonId for all participants
     const userUpdatePromises = participants.map((participantId) =>
       User.findByIdAndUpdate(
         participantId,
         {
-          $unset: { currentProFillerathonId: null },
+          $unset: { currentInflioathonId: null },
         },
         { session }
       )
@@ -579,18 +583,18 @@ const completeProFillerathon = async (ProFillerathon, io) => {
     await Promise.all([...teamUpdatePromises, ...userUpdatePromises]);
     await session.commitTransaction();
 
-    logger.info(`Successfully completed ProFillerathon: ${title}`);
+    logger.info(`Successfully completed Inflioathon: ${title}`);
 
     return {
       success: true,
-      ProFillerathonId: _id,
-      ProFillerathonTitle: title,
+      InflioathonId: _id,
+      InflioathonTitle: title,
       teamsProcessed: teams.length,
       participantsProcessed: participants.length,
     };
   } catch (error) {
     await session.abortTransaction();
-    logger.error(`Failed to complete ProFillerathon ${ProFillerathon.title}:`, error);
+    logger.error(`Failed to complete Inflioathon ${Inflioathon.title}:`, error);
     throw error;
   } finally {
     session.endSession();
@@ -600,264 +604,264 @@ const completeProFillerathon = async (ProFillerathon, io) => {
 // Main scheduler function with comprehensive error handling
 export const startScheduler = (io) => {
   // Team formation scheduler (runs every 30 seconds)
-  cron.schedule(
-    "*/30 * * * * *",
-    async () => {
-      const marker = {
-        status: "started",
-        timestamp: new Date().toISOString(),
-        ProFillerathonsProcessed: 0,
-        errors: [],
-      };
+  // cron.schedule(
+  //   "*/30 * * * * *",
+  //   async () => {
+  //     const marker = {
+  //       status: "started",
+  //       timestamp: new Date().toISOString(),
+  //       InflioathonsProcessed: 0,
+  //       errors: [],
+  //     };
 
-      try {
-        logger.debug("Team formation scheduler started", {
-          timestamp: marker.timestamp,
-        });
+  //     try {
+  //       logger.debug("Team formation scheduler started", {
+  //         timestamp: marker.timestamp,
+  //       });
 
-        const now = new Date();
-        const twoMinutesAgo = new Date(now.getTime() - 2 * 60000);
+  //       const now = new Date();
+  //       const twoMinutesAgo = new Date(now.getTime() - 2 * 60000);
 
-        // Find ProFillerathons where registration deadline has passed
-        const ProFillerathonsToProcess = await ProFillerathon.find({
-          registrationDeadline: { $lte: now, $gte: twoMinutesAgo },
-          isActive: true,
-          status: "registration_open",
-          participants: { $exists: true, $ne: [] },
-        }).populate({
-          path: "participants",
-          select: "name email skills",
-        });
+  //       // Find Inflioathons where registration deadline has passed
+  //       const InflioathonsToProcess = await Inflioathon.find({
+  //         registrationDeadline: { $lte: now, $gte: twoMinutesAgo },
+  //         isActive: true,
+  //         status: "registration_open",
+  //         participants: { $exists: true, $ne: [] },
+  //       }).populate({
+  //         path: "participants",
+  //         select: "name email skills",
+  //       });
 
-        marker.ProFillerathonsToProcess = ProFillerathonsToProcess.length;
-        logger.info(
-          `Found ${ProFillerathonsToProcess.length} ProFillerathons to process for team formation`
-        );
+  //       marker.InflioathonsToProcess = InflioathonsToProcess.length;
+  //       logger.info(
+  //         `Found ${InflioathonsToProcess.length} Inflioathons to process for team formation`
+  //       );
 
-        for (const ProFillerathon of ProFillerathonsToProcess) {
-          const ProFillerathonMarker = {
-            ProFillerathonId: ProFillerathon._id,
-            title: ProFillerathon.title,
-            status: "processing",
-            startedAt: new Date().toISOString(),
-          };
+  //       for (const Inflioathon of InflioathonsToProcess) {
+  //         const InflioathonMarker = {
+  //           InflioathonId: Inflioathon._id,
+  //           title: Inflioathon.title,
+  //           status: "processing",
+  //           startedAt: new Date().toISOString(),
+  //         };
 
-          try {
-            logger.info(
-              `Processing ProFillerathon for team formation: ${ProFillerathon.title}`
-            );
+  //         try {
+  //           logger.info(
+  //             `Processing Inflioathon for team formation: ${Inflioathon.title}`
+  //           );
 
-            const result = await retryOperation(
-              () => createTeamsForProFillerathon(ProFillerathon, io),
-              3,
-              500
-            );
+  //           const result = await retryOperation(
+  //             () => createTeamsForInflioathon(Inflioathon, io),
+  //             3,
+  //             500
+  //           );
 
-            // Check if ProFillerathon was cancelled but handled successfully
-            if (result.cancelled) {
-              ProFillerathonMarker.status = "cancelled";
-              logger.info(
-                `ProFillerathon cancelled successfully: ${ProFillerathon.title} - ${result.reason}`
-              );
-            } else {
-              ProFillerathonMarker.status = "completed";
-              marker.ProFillerathonsProcessed++;
-              logger.info(
-                `Successfully processed ProFillerathon: ${ProFillerathon.title}`
-              );
-            }
+  //           // Check if Inflioathon was cancelled but handled successfully
+  //           if (result.cancelled) {
+  //             InflioathonMarker.status = "cancelled";
+  //             logger.info(
+  //               `Inflioathon cancelled successfully: ${Inflioathon.title} - ${result.reason}`
+  //             );
+  //           } else {
+  //             InflioathonMarker.status = "completed";
+  //             marker.InflioathonsProcessed++;
+  //             logger.info(
+  //               `Successfully processed Inflioathon: ${Inflioathon.title}`
+  //             );
+  //           }
 
-            ProFillerathonMarker.completedAt = new Date().toISOString();
-            ProFillerathonMarker.result = result;
-          } catch (error) {
-            ProFillerathonMarker.status = "failed";
-            ProFillerathonMarker.error = {
-              message: error.message,
-              type: error.type,
-              code: error.code,
-              retryable: error.retryable,
-            };
-            ProFillerathonMarker.completedAt = new Date().toISOString();
-            marker.errors.push(ProFillerathonMarker.error);
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           InflioathonMarker.result = result;
+  //         } catch (error) {
+  //           InflioathonMarker.status = "failed";
+  //           InflioathonMarker.error = {
+  //             message: error.message,
+  //             type: error.type,
+  //             code: error.code,
+  //             retryable: error.retryable,
+  //           };
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.errors.push(InflioathonMarker.error);
 
-            if (error.type === ErrorTypes.TRANSIENT) {
-              logger.warn(
-                `Transient error processing ProFillerathon ${ProFillerathon.title}:`,
-                error
-              );
-            } else if (error.type === ErrorTypes.BUSINESS) {
-              logger.info(
-                `Business rule violation for ProFillerathon ${ProFillerathon.title}: ${error.message}`
-              );
-            } else {
-              logger.error(
-                `Error processing ProFillerathon ${ProFillerathon.title}:`,
-                error
-              );
-            }
-          }
-        }
+  //           if (error.type === ErrorTypes.TRANSIENT) {
+  //             logger.warn(
+  //               `Transient error processing Inflioathon ${Inflioathon.title}:`,
+  //               error
+  //             );
+  //           } else if (error.type === ErrorTypes.BUSINESS) {
+  //             logger.info(
+  //               `Business rule violation for Inflioathon ${Inflioathon.title}: ${error.message}`
+  //             );
+  //           } else {
+  //             logger.error(
+  //               `Error processing Inflioathon ${Inflioathon.title}:`,
+  //               error
+  //             );
+  //           }
+  //         }
+  //       }
 
-        marker.status = "completed";
-        marker.completedAt = new Date().toISOString();
+  //       marker.status = "completed";
+  //       marker.completedAt = new Date().toISOString();
 
-        logger.debug("Team formation scheduler completed", {
-          ProFillerathonsProcessed: marker.ProFillerathonsProcessed,
-          totalErrors: marker.errors.length,
-        });
-      } catch (error) {
-        marker.status = "failed";
-        marker.error = classifyError(error);
-        marker.completedAt = new Date().toISOString();
-        logger.error("Team formation scheduler fatal error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.debug("Team formation scheduler completed", {
+  //         InflioathonsProcessed: marker.InflioathonsProcessed,
+  //         totalErrors: marker.errors.length,
+  //       });
+  //     } catch (error) {
+  //       marker.status = "failed";
+  //       marker.error = classifyError(error);
+  //       marker.completedAt = new Date().toISOString();
+  //       logger.error("Team formation scheduler fatal error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
-  // ProFillerathon completion scheduler (runs every minute)
-  cron.schedule(
-    "* * * * *",
-    async () => {
-      const marker = {
-        status: "started",
-        timestamp: new Date().toISOString(),
-        ProFillerathonsScheduled: 0,
-        errors: [],
-      };
+  // Inflioathon completion scheduler (runs every minute)
+  // cron.schedule(
+  //   "* * * * *",
+  //   async () => {
+  //     const marker = {
+  //       status: "started",
+  //       timestamp: new Date().toISOString(),
+  //       InflioathonsScheduled: 0,
+  //       errors: [],
+  //     };
 
-      try {
-        logger.debug("ProFillerathon completion scheduler started", {
-          timestamp: marker.timestamp,
-        });
+  //     try {
+  //       logger.debug("Inflioathon completion scheduler started", {
+  //         timestamp: marker.timestamp,
+  //       });
 
-        const now = new Date();
-        const threshold = new Date(now.getTime() + 3 * 60 * 1000);
+  //       const now = new Date();
+  //       const threshold = new Date(now.getTime() + 3 * 60 * 1000);
 
-        // Find ProFillerathons ending soon
-        const ProFillerathonsToComplete = await ProFillerathon.find({
-          startDate: { $lte: now }, // already started
-          endDate: { $gt: now, $lte: threshold }, // ending in next X minutes
-          isActive: true,
-          status: {
-            $in: ["registration_closed", "ongoing", "winner_to_announced"],
-          },
-        });
+  //       // Find Inflioathons ending soon
+  //       const InflioathonsToComplete = await Inflioathon.find({
+  //         startDate: { $lte: now }, // already started
+  //         endDate: { $gt: now, $lte: threshold }, // ending in next X minutes
+  //         isActive: true,
+  //         status: {
+  //           $in: ["registration_closed", "ongoing", "winner_to_announced"],
+  //         },
+  //       });
 
-        marker.ProFillerathonsToComplete = ProFillerathonsToComplete.length;
-        logger.info(
-          `Found ${ProFillerathonsToComplete.length} ProFillerathons to complete`
-        );
+  //       marker.InflioathonsToComplete = InflioathonsToComplete.length;
+  //       logger.info(
+  //         `Found ${InflioathonsToComplete.length} Inflioathons to complete`
+  //       );
 
-        for (const ProFillerathon of ProFillerathonsToComplete) {
-          const ProFillerathonMarker = {
-            ProFillerathonId: ProFillerathon._id,
-            title: ProFillerathon.title,
-            status: "processing",
-            startedAt: new Date().toISOString(),
-          };
+  //       for (const Inflioathon of InflioathonsToComplete) {
+  //         const InflioathonMarker = {
+  //           InflioathonId: Inflioathon._id,
+  //           title: Inflioathon.title,
+  //           status: "processing",
+  //           startedAt: new Date().toISOString(),
+  //         };
 
-          try {
-            logger.info(`Completing ProFillerathon: ${ProFillerathon.title}`);
-            await retryOperation(
-              () => completeProFillerathon(ProFillerathon, io),
-              3,
-              500
-            );
+  //         try {
+  //           logger.info(`Completing Inflioathon: ${Inflioathon.title}`);
+  //           await retryOperation(
+  //             () => completeInflioathon(Inflioathon, io),
+  //             3,
+  //             500
+  //           );
 
-            ProFillerathonMarker.status = "completed";
-            ProFillerathonMarker.completedAt = new Date().toISOString();
-            marker.ProFillerathonsScheduled++;
+  //           InflioathonMarker.status = "completed";
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.InflioathonsScheduled++;
 
-            logger.info(`Successfully completed ProFillerathon: ${ProFillerathon.title}`);
-          } catch (error) {
-            ProFillerathonMarker.status = "failed";
-            ProFillerathonMarker.error = {
-              message: error.message,
-              type: error.type,
-              code: error.code,
-            };
-            ProFillerathonMarker.completedAt = new Date().toISOString();
-            marker.errors.push(ProFillerathonMarker.error);
-            logger.error(
-              `Error completing ProFillerathon ${ProFillerathon.title}:`,
-              error
-            );
-          }
-        }
+  //           logger.info(`Successfully completed Inflioathon: ${Inflioathon.title}`);
+  //         } catch (error) {
+  //           InflioathonMarker.status = "failed";
+  //           InflioathonMarker.error = {
+  //             message: error.message,
+  //             type: error.type,
+  //             code: error.code,
+  //           };
+  //           InflioathonMarker.completedAt = new Date().toISOString();
+  //           marker.errors.push(InflioathonMarker.error);
+  //           logger.error(
+  //             `Error completing Inflioathon ${Inflioathon.title}:`,
+  //             error
+  //           );
+  //         }
+  //       }
 
-        marker.status = "completed";
-        marker.completedAt = new Date().toISOString();
+  //       marker.status = "completed";
+  //       marker.completedAt = new Date().toISOString();
 
-        logger.debug("ProFillerathon completion scheduler completed", {
-          ProFillerathonsScheduled: marker.ProFillerathonsScheduled,
-          totalErrors: marker.errors.length,
-        });
-      } catch (error) {
-        marker.status = "failed";
-        marker.error = classifyError(error);
-        marker.completedAt = new Date().toISOString();
-        logger.error("ProFillerathon completion scheduler fatal error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.debug("Inflioathon completion scheduler completed", {
+  //         InflioathonsScheduled: marker.InflioathonsScheduled,
+  //         totalErrors: marker.errors.length,
+  //       });
+  //     } catch (error) {
+  //       marker.status = "failed";
+  //       marker.error = classifyError(error);
+  //       marker.completedAt = new Date().toISOString();
+  //       logger.error("Inflioathon completion scheduler fatal error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
   // Status update scheduler (runs every 5 minutes)
-  cron.schedule(
-    "*/5 * * * *",
-    async () => {
-      try {
-        logger.info("ProFillerathon status update scheduler started");
-        const now = new Date();
+  // cron.schedule(
+  //   "*/5 * * * *",
+  //   async () => {
+  //     try {
+  //       logger.info("Inflioathon status update scheduler started");
+  //       const now = new Date();
 
-        // Update ProFillerathons that should be in "ongoing" status
-        const ongoingResult = await ProFillerathon.updateMany(
-          {
-            startDate: { $lte: now },
-            endDate: { $gt: now },
-            status: "registration_closed",
-            isActive: true,
-          },
-          {
-            $set: { status: "ongoing" },
-          }
-        );
+  //       // Update Inflioathons that should be in "ongoing" status
+  //       const ongoingResult = await Inflioathon.updateMany(
+  //         {
+  //           startDate: { $lte: now },
+  //           endDate: { $gt: now },
+  //           status: "registration_closed",
+  //           isActive: true,
+  //         },
+  //         {
+  //           $set: { status: "ongoing" },
+  //         }
+  //       );
 
-        // Update ProFillerathons that should be in "winner_to_announced" status
-        const winnerResult = await ProFillerathon.updateMany(
-          {
-            endDate: { $lte: now },
-            winnerAnnouncementDate: { $gt: now },
-            status: "ongoing",
-            isActive: true,
-          },
-          {
-            $set: { status: "winner_to_announced" },
-          }
-        );
+  //       // Update Inflioathons that should be in "winner_to_announced" status
+  //       const winnerResult = await Inflioathon.updateMany(
+  //         {
+  //           endDate: { $lte: now },
+  //           winnerAnnouncementDate: { $gt: now },
+  //           status: "ongoing",
+  //           isActive: true,
+  //         },
+  //         {
+  //           $set: { status: "winner_to_announced" },
+  //         }
+  //       );
 
-        logger.info("ProFillerathon status update scheduler completed", {
-          ongoingUpdated: ongoingResult.modifiedCount,
-          winnerUpdated: winnerResult.modifiedCount,
-        });
-      } catch (error) {
-        logger.error("ProFillerathon status update scheduler error:", error);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "UTC",
-    }
-  );
+  //       logger.info("Inflioathon status update scheduler completed", {
+  //         ongoingUpdated: ongoingResult.modifiedCount,
+  //         winnerUpdated: winnerResult.modifiedCount,
+  //       });
+  //     } catch (error) {
+  //       logger.error("Inflioathon status update scheduler error:", error);
+  //     }
+  //   },
+  //   {
+  //     scheduled: true,
+  //     timezone: "UTC",
+  //   }
+  // );
 
-  logger.info("All ProFillerathon schedulers started successfully");
+  logger.info("Schedulers started successfully");
 };
 
 // Export for testing
@@ -866,7 +870,7 @@ export {
   SchedulerError,
   classifyError,
   retryOperation,
-  createTeamsForProFillerathon,
-  completeProFillerathon,
-  cancelProFillerathon,
+  createTeamsForInflioathon,
+  completeInflioathon,
+  cancelInflioathon,
 };
