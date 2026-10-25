@@ -12,6 +12,10 @@ import compression from "compression";
 import logger from "./utils/logger.js";
 import errorHandler from "./middlewares/error.js";
 import authRouter from "./routes/auth.routes.js";
+import resumeRouter from "./routes/resume.routes.js";
+// import {redis,RedisConnection} from "./scale/redis.js";
+// import webSocketService from "./services/websocket.service.js";
+// import ProFillerathonRouter from "./routes/ProFillerthon.routes.js";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -37,6 +41,10 @@ app.use(morgan("combined", { stream: logger.stream }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
+
+// RedisConnection(); 
+
+// Routes
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -57,6 +65,32 @@ app.use((req, res) => {
   });
 });
 
+
+// // ── Attach Socket.IO ──────────────────────────
+// initSocket(server);
+
+// Error handler middleware
+app.use(errorHandler);
+
+
+// Start server
+const PORT = config.server.port;
+server.listen(PORT, "0.0.0.0", () => {
+  logger.info(`Server running in ${config.NODE_ENV} mode on port ${PORT}`);
+});
+
+// WebSocket service
+// For Now We dont Need it
+// webSocketService.initialize(server);
+
+// Graceful shutdown
+process.on("unhandledRejection", (err) => {
+  logger.error(`Unhandled Rejection: ${err.message}`);
+  server.close(() => process.exit(1));
+});
+
+// Export app and server
+export { app, server };
 app.use(errorHandler);
 
 export default app;
