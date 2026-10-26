@@ -1,7 +1,8 @@
 name: Build portable release
 
 # Triggered when release-please publishes a release (which also creates the
-# tag). Manual runs build the same ZIP as a downloadable workflow artifact.
+# tag). Manual runs build the same ZIP as a downloadable workflow artifact;
+# set `publish: true` to attach the ZIP to an existing release instead.
 on:
   release:
     types: [published]
@@ -11,6 +12,11 @@ on:
         description: "Version/tag to build (e.g. v1.0.0); used in the file name"
         required: false
         default: "v0.0.0-dev"
+      publish:
+        description: "Attach the ZIP to the matching GitHub release"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -184,19 +190,19 @@ jobs:
           Write-Host "SHA256 $hash"
 
       - name: Upload to GitHub release
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || inputs.publish
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = "${{ github.event.release.tag_name }}"
+          $tag = "${{ github.event.release.tag_name || inputs.tag }}"
           $zip = Get-ChildItem -Path . -Filter 'ProfileGPT-*.zip' -File | Select-Object -First 1
           $sha = Get-ChildItem -Path . -Filter 'ProfileGPT-*.zip.sha256' -File | Select-Object -First 1
           if (-not $zip -or -not $sha) { throw 'Release files not found.' }
           gh release upload $tag $zip.FullName $sha.FullName --clobber
 
       - name: Upload workflow artifact
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
         uses: actions/upload-artifact@v4
         with:
           name: ProfileGPT-portable-windows-x64
