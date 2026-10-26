@@ -37,10 +37,10 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -49,25 +49,25 @@ jobs:
             frontend/package-lock.json
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: AiAnalyser/requirements-light.txt
 
-      # ── Frontend: static SPA build served by the bundled backend ──────────
+      # â”€â”€ Frontend: static SPA build served by the bundled backend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       - name: Build desktop SPA
         working-directory: frontend
         run: |
           npm ci
           npm run build:desktop
 
-      # ── Backend: production dependencies only ─────────────────────────────
+      # â”€â”€ Backend: production dependencies only â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       - name: Install backend dependencies
         working-directory: backend
         run: npm ci --omit=dev --no-audit --no-fund
 
-      # ── Python sidecar: light extraction, PyInstaller one-folder build ────
+      # â”€â”€ Python sidecar: light extraction, PyInstaller one-folder build â”€â”€â”€â”€
       - name: Install analyser dependencies
         run: |
           python -m pip install --upgrade pip
@@ -77,7 +77,7 @@ jobs:
         working-directory: AiAnalyser
         run: pyinstaller --clean --noconfirm profilegpt-analyser.spec
 
-      # ── Assemble the portable folder ──────────────────────────────────────
+      # â”€â”€ Assemble the portable folder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       - name: Assemble portable bundle
         shell: pwsh
         run: |
@@ -113,7 +113,7 @@ jobs:
           Copy-Item -Path 'frontend/dist/client/*' -Destination "$stage/web" -Recurse
           if (-not (Test-Path "$stage/web/_shell.html") -and
               -not (Test-Path "$stage/web/index.html")) {
-            throw 'The web build is missing both _shell.html and index.html — the desktop build failed.'
+            throw 'The web build is missing both _shell.html and index.html â€” the desktop build failed.'
           }
 
           # Bundled Node runtime
@@ -203,7 +203,7 @@ jobs:
 
       - name: Upload workflow artifact
         if: github.event_name == 'workflow_dispatch' && !inputs.publish
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ProfileGPT-portable-windows-x64
           path: |
