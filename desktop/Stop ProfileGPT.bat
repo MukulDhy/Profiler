@@ -5,7 +5,7 @@ cd /d "%~dp0"
 
 if not exist "data\launcher.pid" (
   echo [ProfileGPT] Not running ^(no data\launcher.pid^).
-  timeout /t 2 >nul
+  ping -n 3 127.0.0.1 >nul
   exit /b 0
 )
 
@@ -19,4 +19,4 @@ if defined PID (
 )
 
 del /q "data\launcher.pid" >nul 2>&1
-timeout /t 2 >nul
+ping -n 3 127.0.0.1 >nul
