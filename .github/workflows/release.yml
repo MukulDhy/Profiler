@@ -139,9 +139,13 @@ jobs:
           ) | Where-Object { Test-Path $_ } | Select-Object -First 1
           if (-not $csc) { throw 'csc.exe (Windows .NET Framework) not found.' }
 
+          # csc.exe mangles relative paths that use forward slashes, so hand it
+          # an absolute Windows path.
+          $launcherSource = (Resolve-Path 'desktop/ProfileGPTLauncher.cs').Path
+          $launcherExe = (Join-Path (Resolve-Path $stage).Path 'ProfileGPT.exe')
           & $csc /nologo /target:winexe /optimize+ /platform:anycpu `
-            /out:"$stage/ProfileGPT.exe" /reference:System.Windows.Forms.dll `
-            'desktop/ProfileGPTLauncher.cs'
+            "/out:$launcherExe" /reference:System.Windows.Forms.dll `
+            $launcherSource
           if ($LASTEXITCODE -ne 0) { throw "Launcher build failed ($LASTEXITCODE)." }
 
           # Never ship credentials, even if a tracked .env slips through.
