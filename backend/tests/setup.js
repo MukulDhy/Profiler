@@ -5,7 +5,11 @@ import logger from "../utils/logger.js";
 let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    // mongodb-memory-server 8 defaults to "ephemeralForTest", which MongoDB 7+
+    // no longer supports. wiredTiger works across all supported versions.
+    instance: { storageEngine: "wiredTiger" },
+  });
   await mongoose.connect(mongoServer.getUri());
   logger.info("Connected to in-memory database for testing");
 });

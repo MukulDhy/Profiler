@@ -1,16 +1,31 @@
 name: release-please
+
 on:
   push:
     branches:
       - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-please-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
+
       - name: release-please
-        uses: google-github-actions/release-please-action@v3
+        uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
+          # There is no package.json at the repo root, so use the generic
+          # strategy instead of the "node" one.
+          release-type: simple
           package-name: "ProfileGPT"

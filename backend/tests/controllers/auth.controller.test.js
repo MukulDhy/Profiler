@@ -1,7 +1,7 @@
 // tests/controllers/auth.controller.test.js
 import request from "supertest";
-import app from "../../app.js";
-import User from "../../models/user.model";
+import { app } from "../../app.js";
+import User from "../../models/user.model.js";
 
 describe("Auth Controller", () => {
   describe("POST /api/auth/register", () => {
@@ -19,9 +19,9 @@ describe("Auth Controller", () => {
       expect(response.statusCode).toBe(201);
       expect(response.body.success).toBe(true);
 
-      // ✅ Fix 1: controller sends accessToken & user at top leve  l, not nested in data
-      expect(response.body).toHaveProperty("accessToken");
-      expect(response.body.user).toHaveProperty("email", userData.email);
+      // Controller returns the token and user inside `data`.
+      expect(response.body.data).toHaveProperty("accessToken");
+      expect(response.body.data.user).toHaveProperty("email", userData.email);
 
       // Verify user was created in DB
       const userInDb = await User.findOne({ email: userData.email });
@@ -89,8 +89,8 @@ describe("Auth Controller", () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body.success).toBe(true);
-      // ✅ Fix 1 (same): accessToken is top-level, not nested in data
-      expect(response.body).toHaveProperty("accessToken");
+      // accessToken is returned inside `data`.
+      expect(response.body.data).toHaveProperty("accessToken");
     });
 
     it("should not login with incorrect password", async () => {
