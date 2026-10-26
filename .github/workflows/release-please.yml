@@ -26,6 +26,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # There is no package.json at the repo root, so use the generic
-          # strategy instead of the "node" one.
+          # strategy instead of the "node" one. The package name is derived
+          # from the repository name ("release-please-action@v5" no longer
+          # accepts a `package-name` input).
           release-type: simple
-          package-name: "ProfileGPT"
