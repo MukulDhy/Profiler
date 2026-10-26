@@ -82,7 +82,9 @@ function log(message) {
 
 function readConfig() {
   try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+    // Strip a UTF-8 BOM: editing config.json in Notepad adds one.
+    const raw = fs.readFileSync(CONFIG_PATH, "utf8").replace(/^\uFEFF/, "");
+    return JSON.parse(raw);
   } catch {
     return null;
   }

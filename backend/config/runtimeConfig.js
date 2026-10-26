@@ -89,7 +89,9 @@ export const DEFAULT_CONFIG = {
 
 const safeReadJson = (filePath) => {
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+    // Notepad and PowerShell add a UTF-8 BOM; JSON.parse chokes on it.
+    const raw = fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, "");
+    return JSON.parse(raw);
   } catch {
     return null;
   }
