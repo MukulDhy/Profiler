@@ -8,6 +8,7 @@ import { AppError } from "../utils/appError.js";
 import sendMail from "../utils/sendMail.js";
 import logger from "../utils/logger.js";
 import { uploadImage } from "../utils/uploadImage.js";
+import { IS_PORTABLE } from "../config/runtimeConfig.js";
 
 const ACCESS_COOKIE = "accessToken";
 const REFRESH_COOKIE = "refreshToken";
@@ -16,10 +17,16 @@ const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 const isProduction = () => process.env.NODE_ENV === "production";
 
+// The desktop build runs over plain HTTP on loopback, where `Secure` cookies
+// would never be sent back. Keep them lax + non-secure in that mode.
+const secureCookies = () =>
+  process.env.COOKIE_SECURE === "true" ||
+  (process.env.COOKIE_SECURE !== "false" && isProduction() && !IS_PORTABLE);
+
 const cookieOptions = (maxAge) => ({
   httpOnly: true,
-  secure: isProduction(),
-  sameSite: isProduction() ? "strict" : "lax",
+  secure: secureCookies(),
+  sameSite: secureCookies() ? "strict" : "lax",
   path: "/",
   maxAge,
 });
@@ -54,7 +61,7 @@ const sendVerificationEmail = async (user) => {
   const otp = user.createEmailVerificationOtp();
   await user.save({ validateBeforeSave: false });
 
-  if (!isProduction()) {
+  if (!isProduction() || IS_PORTABLE) {
     logger.info(`📧 Email verification OTP for ${user.email}: ${otp}`);
   }
 
@@ -376,7 +383,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   const clientUrl = process.env.CLIENT_URL || "http://localhost:8080";
   const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
 
-  if (!isProduction()) {
+  if (!isProduction() || IS_PORTABLE) {
     logger.info(`🔑 Password reset link for ${user.email}: ${resetUrl}`);
   }
 

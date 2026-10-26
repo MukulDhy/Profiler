@@ -1,3 +1,19 @@
 .env
 .env.*
 !.env.example
+# The desktop build needs this mode file in the repo.
+!frontend/.env.desktop
+
+# Portable release build artifacts
+ProfileGPT-*-win64/
+ProfileGPT-*.zip
+ProfileGPT-*.zip.sha256
+desktop/*.exe
+AiAnalyser/build/
+AiAnalyser/dist/
+
+# Portable runtime state (when running the bundle from the repo root)
+/portable.flag
+/config.json
+/data/
+/logs/

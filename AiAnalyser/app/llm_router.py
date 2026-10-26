@@ -54,12 +54,23 @@ class LLMRouter:
         self.primary: str = routing.get("primary", "")
         self.fallback: list[str] = list(routing.get("fallback") or [])
 
+        # The portable app stores the chosen provider/key in config.json and
+        # passes them through the environment, so allow them to win over the
+        # static routing table.
+        override_primary = (os.environ.get("AI_PROVIDER") or "").strip().lower()
+        if override_primary:
+            self.primary = override_primary
+        self.model_override = (os.environ.get("AI_MODEL") or "").strip()
+
         self.providers: dict[str, ProviderConfig] = {}
         for name, entry in (raw.get("providers") or {}).items():
+            model = entry.get("model", "")
+            if name == self.primary and self.model_override:
+                model = self.model_override
             self.providers[name] = ProviderConfig(
                 name=name,
                 type=entry.get("type", "openai"),
-                model=entry.get("model", ""),
+                model=model,
                 api_key_env=entry.get("api_key_env", f"{name.upper()}_API_KEY"),
                 base_url=entry.get("base_url"),
                 timeout_s=int(entry.get("timeout_s", 120)),

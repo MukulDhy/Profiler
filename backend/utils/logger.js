@@ -18,8 +18,12 @@ const logger = winston.createLogger({
   ],
 });
 
-// If we're not in production, also log to the console
-if (process.env.NODE_ENV !== "production") {
+// If we're not in production, also log to the console. The portable launcher
+// sets LOG_TO_CONSOLE so its captured stdout is useful.
+if (
+  process.env.NODE_ENV !== "production" ||
+  process.env.LOG_TO_CONSOLE === "1"
+) {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(

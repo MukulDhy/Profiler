@@ -23,6 +23,35 @@ The upload endpoint responds immediately with `processingStatus: "processing"`.
 The backend analyses the file in the background and the frontend polls
 `GET /api/resume/:id/profile` until the profile is ready.
 
+## Download the desktop app (Windows x64)
+
+The quickest way to use ProfileGPT is the portable build from
+[Releases](https://github.com/MukulDhy/ProfilerGPT/releases/latest):
+
+1. Download `ProfileGPT-<version>-win64.zip` (and optionally the `.sha256`).
+2. Extract the whole folder somewhere writable (not `Program Files`).
+3. Double-click `ProfileGPT.exe`.
+4. The setup wizard asks for a MongoDB connection string and one AI provider
+   key. A free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
+   cluster works — no local database is needed.
+
+The ZIP bundles the Node runtime, the Express API, the built frontend and the
+Python analyser, so Node, Python and MongoDB do not need to be installed.
+Credentials are stored in `config.json` inside the extracted folder; resumes
+and logs stay in `data/` and `logs/`.
+
+Portable-build caveats:
+
+- Windows x64 only and unsigned, so SmartScreen may warn on first run.
+- Light PDF/DOCX extraction (`pypdf` + `python-docx`) instead of Docling —
+  complex or scanned resumes may extract less cleanly.
+- Outbound email is disabled. Verification codes are written to
+  `logs/backend.log`, and email verification is not required to sign in.
+- Share links use `http://127.0.0.1:5001/...` and only work on that machine.
+- `Stop ProfileGPT.bat` shuts the background servers down when you are done.
+
+The rest of this README describes running from source.
+
 ## Repository layout
 
 | Path          | What it is                                                              |
@@ -176,8 +205,9 @@ the Google button is hidden.
 
 ## Pipeline details
 
-1. **Docling** converts the PDF/DOCX to Markdown (~60–90 s on CPU the first time
-   while models load).
+1. **Extract** — Docling converts the PDF/DOCX to Markdown in development.
+   Portable builds set `EXTRACTION_MODE=light` and use `pypdf` / `python-docx`
+   instead, which skips the model download and starts instantly.
 2. **Clean** normalises whitespace and truncates to `MAX_INPUT_CHARS`.
 3. **Structure** asks the routed LLM for the `ResumeProfile` schema.
 4. **Validate** enforces the schema plus semantic requirements (name, summary,
@@ -188,6 +218,27 @@ the Google button is hidden.
 
 `codingActivity` from the resume is always empty because a resume has no commit
 history; the dashboard uses live GitHub data instead.
+
+## Building the portable release
+
+`.github/workflows/release.yml` runs when release-please publishes a release
+and attaches `ProfileGPT-<version>-win64.zip` plus a `.sha256` file to it.
+Manual runs from the Actions tab build the same ZIP as a workflow artifact.
+
+The bundle is assembled from:
+
+| Piece | Source |
+| --- | --- |
+| `backend/` | `npm ci --omit=dev` |
+| `web/` | `npm run build:desktop` (`frontend/dist/client`) |
+| `runtime/node.exe` | Node runtime used by CI |
+| `ai/` | `pyinstaller profilegpt-analyser.spec` with `requirements-light.txt` |
+| `ProfileGPT.exe` | `desktop/ProfileGPTLauncher.cs`, compiled with the .NET Framework compiler bundled with Windows |
+| launcher scripts | `desktop/launcher.js` + the `.bat` / `.vbs` helpers |
+
+The desktop SPA is built with `frontend/vite.config.desktop.ts` and
+`frontend/.env.desktop` (`VITE_API_URL=/api`). It emits `_shell.html`, which
+the Express app serves together with the API from a single port.
 
 ## Troubleshooting
 
@@ -201,3 +252,6 @@ history; the dashboard uses live GitHub data instead.
 | Re-analysis returns 502 | Older records have no stored text and Cloudinary raw delivery is blocked — upload the file again. |
 | Google button missing | Set both `GOOGLE_CLIENT_ID` and `VITE_GOOGLE_CLIENT_ID`, then restart both servers. |
 | Verification code never arrives | Check `SMTP_*` credentials; in development the OTP is also printed in the backend log. |
+| Portable app shows "Windows protected your PC" | The ZIP is unsigned. Choose **More info → Run anyway**, or run `Start ProfileGPT.bat`. |
+| Portable app opens but setup never finishes | Check the MongoDB URI with **Test connection** and confirm the provider key; details are in `logs/backend.log`. |
+| Portable analysis says the analyser is unreachable | Wait ~20 s for `ai\profilegpt-analyser.exe` to start, then check `logs/analyser.log`. |

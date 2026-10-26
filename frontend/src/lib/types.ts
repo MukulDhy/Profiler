@@ -318,3 +318,26 @@ export interface PublicChatResponse {
   provider?: string | null;
   model?: string | null;
 }
+
+// --- First-run setup (portable / desktop builds) ----------------------------
+
+export interface SetupStatus {
+  configured: boolean;
+  needsSetup: boolean;
+  version: string;
+  portable: boolean;
+  home: string;
+  configPath: string;
+  storage: string;
+  mail: string;
+  database: { connected: boolean; host: string | null };
+  llm: { provider: string; model: string; hasKey: boolean };
+  providers: string[];
+}
+
+export interface SetupConfigInput {
+  mongoUri: string;
+  llmProvider: string;
+  llmApiKey: string;
+  llmModel?: string;
+}

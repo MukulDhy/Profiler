@@ -1,16 +1,29 @@
 import path from "path";
-import dotenv from "dotenv";
+import "./env.js";
 import { fileURLToPath } from "url";
+import {
+  loadRuntimeConfig,
+  HOME_DIR,
+  IS_PORTABLE,
+  CONFIG_PATH,
+} from "./runtimeConfig.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+// Portable builds read `config.json` (written by the setup wizard) and map it
+// onto environment variables. `.env` is loaded by ./env.js for development.
+loadRuntimeConfig();
+
+const mongoUri = process.env.MONGO_URI || "";
+const serverPort = Number(process.env.PORT || 5001);
+const localOrigin = `http://127.0.0.1:${serverPort}`;
 
 const config = {
-  // Server
+  // Server — loopback only by default; the desktop app is a single-user tool.
   server: {
-    host: process.env.HOST || "192.168.0.103",
-    port: process.env.PORT || 5001,
+    host: process.env.HOST || "127.0.0.1",
+    port: serverPort,
   },
 
   // CORS
@@ -18,19 +31,39 @@ const config = {
     allowedOrigins: [
       "*",
       "http://localhost:3000",
-      "http://192.168.0.103:8081",
-      "http://192.168.0.103:5000",
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
     ],
   },
+
+  // Runtime
+  runtime: {
+    home: HOME_DIR,
+    configPath: CONFIG_PATH,
+    isPortable: IS_PORTABLE,
+    hasDatabase: Boolean(mongoUri),
+    configured: Boolean(mongoUri),
+  },
+
+  // Storage: "local" keeps resumes in the app's data folder, "cloudinary"
+  // keeps the hosted behaviour.
+  storage: (process.env.STORAGE || "local").toLowerCase(),
+  // Mail: "disabled" skips outbound email (verification codes are logged).
+  mailMode: (
+    process.env.MAIL_MODE ||
+    (process.env.SMTP_MAIL && process.env.SMTP_PASSWORD ? "smtp" : "disabled")
+  ).toLowerCase(),
 
   // Environment
   JWT_COOKIE_EXPIRE: process.env.JWT_COOKIE_EXPIRE || 20,
   NODE_ENV: process.env.NODE_ENV || "development",
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:8080",
+  CLIENT_URL:
+    process.env.CLIENT_URL ||
+    (IS_PORTABLE ? localOrigin : "http://localhost:8080"),
 
   // Database
-  MONGO_URI:
-    process.env.MONGO_URI || "mongodb://localhost:27017/care-management",
+  MONGO_URI: mongoUri || "mongodb://localhost:27017/care-management",
+  hasMongoUri: Boolean(mongoUri),
 
   // Authentication
   JWT_SECRET: process.env.JWT_SECRET || "your_jwt_secret_key_here",

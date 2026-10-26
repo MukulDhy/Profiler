@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -9,7 +10,14 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = BASE_DIR / ".env"
+
+# PyInstaller builds unpack bundled data (models.yaml etc.) into `_MEIPASS`,
+# while writable state (temp files, .env) belongs next to the executable.
+_FROZEN = bool(getattr(sys, "frozen", False))
+BUNDLE_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
+APP_DIR = Path(sys.executable).resolve().parent if _FROZEN else BASE_DIR
+
+ENV_FILE = APP_DIR / ".env"
 
 # pydantic-settings parses .env into the Settings object, but provider keys are
 # resolved through os.environ by the LLM router. Load the file into the process
@@ -36,14 +44,14 @@ class Settings(BaseSettings):
     max_file_mb: int = 5
     max_input_chars: int = 40_000
     max_repair_attempts: int = 2
-    temp_dir: str = str(BASE_DIR / "tmp")
+    temp_dir: str = str(APP_DIR / "tmp")
 
     # LLM defaults (provider keys are read from the env vars named in models.yaml)
     llm_temperature: float = 0.1
     llm_max_retries: int = 1
 
-    # Routing table
-    models_config: str = str(BASE_DIR / "config" / "models.yaml")
+    # Routing table (bundled alongside the executable when frozen)
+    models_config: str = str(BUNDLE_DIR / "config" / "models.yaml")
 
     @property
     def max_file_bytes(self) -> int:

@@ -3,13 +3,17 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useNavigate,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth";
+import { setupApi } from "@/lib/api";
 
 function NotFoundComponent() {
   return (
@@ -122,8 +126,44 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <SetupGate>
+          <Outlet />
+        </SetupGate>
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+/**
+ * First launch of a portable build has no database yet. Send the user to the
+ * setup wizard instead of showing a dashboard full of failed requests.
+ */
+function SetupGate({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    let active = true;
+
+    setupApi
+      .status()
+      .then((status) => {
+        if (!active) return;
+        if (status.needsSetup && pathname !== "/setup") {
+          void navigate({ to: "/setup", replace: true });
+        }
+      })
+      .catch(() => {
+        // Backend still booting — the individual pages surface the error.
+      });
+
+    return () => {
+      active = false;
+    };
+    // Intentionally runs once per mount; re-checking on navigation would fight
+    // with the router.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <>{children}</>;
 }

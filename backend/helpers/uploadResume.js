@@ -3,27 +3,42 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
 import axios from "axios";
-import dotenv from "dotenv";
 import logger from "../utils/logger.js";
+import { DATA_DIR, ensureDirs } from "../config/runtimeConfig.js";
+import "../config/env.js";
+import {
+  deleteLocalFile,
+  isLocalStorage,
+  localPathForUrl,
+  saveLocalFile,
+} from "./storage.js";
 
-dotenv.config();
 
-// ✅ Configure Cloudinary
+// ─────────────────────────────────────────────────────────────────────────────
+// Cloudinary (hosted deployments only)
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const configCloudinary = () => {
+  if (isLocalStorage()) {
+    logger.info("📁 File storage: local disk (Cloudinary disabled)");
+    return;
+  }
+
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
-  logger.info("✅ Cloudinary configured successfully");
+  logger.info("✅ Cloudinary configured");
 };
 
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // Multer — resume upload (PDF / DOCX, 5 MB)
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
-const UPLOAD_DIR = path.resolve("uploads", "Resume");
+/** Temporary staging folder; files are moved to permanent storage afterwards. */
+const UPLOAD_DIR = path.join(DATA_DIR, "tmp");
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 export const ALLOWED_RESUME_TYPES = {
@@ -50,6 +65,7 @@ export const resolveResumeFileType = (mimetype, originalname = "") => {
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
+    ensureDirs();
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     cb(null, UPLOAD_DIR);
   },
@@ -65,7 +81,10 @@ export const upload = multer({
   limits: { fileSize: MAX_SIZE_BYTES },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (!ALLOWED_EXTENSIONS.has(ext) || !resolveResumeFileType(file.mimetype, file.originalname)) {
+    if (
+      !ALLOWED_EXTENSIONS.has(ext) ||
+      !resolveResumeFileType(file.mimetype, file.originalname)
+    ) {
       return cb(
         new Error("Unsupported file type. Only PDF and DOCX are allowed.")
       );
@@ -98,29 +117,44 @@ export const uploadSingleResume = (req, res, next) => {
   });
 };
 
-// ─────────────────────────────────────────────
-// Cloudinary helpers
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Storage helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Persist a resume file.
+ *
+ * Local mode moves the file into `<data home>/data/uploads/resumes` and returns
+ * a `/uploads/...` URL. Cloudinary mode keeps the original behaviour.
+ */
 export const uploadResume = async (
   filePath,
   uploadLocal = false,
   options = {}
 ) => {
+  if (isLocalStorage()) {
+    const baseName =
+      options.public_id || `resume_${Date.now()}_${path.parse(filePath).name}`;
+    const stored = await saveLocalFile(filePath, {
+      folder: "resumes",
+      baseName,
+      ext: path.extname(filePath),
+    });
+    return stored;
+  }
+
   try {
-    // ✅ Upload file to Cloudinary
     const result = await cloudinary.uploader.upload(filePath, {
       folder: "Resumes",
       resource_type: "raw", // better for pdf/docx
       ...options,
     });
 
-    // Upload to Local Storage if required
-
     return {
       url: result.secure_url,
       public_id: result.public_id,
       original_filename: result.original_filename,
+      storage: "cloudinary",
     };
   } catch (error) {
     logger.error("❌ Error uploading resume to Cloudinary:", error);
@@ -129,17 +163,28 @@ export const uploadResume = async (
   }
 };
 
+/** Remove a stored resume (used when an upload is deleted). */
+export const deleteStoredResume = async (publicId) => {
+  if (!publicId) return;
+  if (isLocalStorage()) {
+    await deleteLocalFile(publicId);
+    return;
+  }
+
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+  } catch (error) {
+    logger.warn(`Could not delete ${publicId} from Cloudinary: ${error.message}`);
+  }
+};
+
 /**
- * Re-download a previously uploaded resume from storage into the local temp
- * directory (used by the re-analyse endpoint).
+ * Copy a previously uploaded resume into the local temp directory (used by the
+ * re-analyse endpoint). Understands both `/uploads/...` local URLs and remote
+ * (Cloudinary) URLs.
  */
 export const downloadResumeToTemp = async (url, fileName = "resume.pdf") => {
-  const response = await axios.get(url, {
-    responseType: "arraybuffer",
-    timeout: 60_000,
-    maxContentLength: MAX_SIZE_BYTES,
-  });
-
+  ensureDirs();
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
   const ext = path.extname(fileName) || ".pdf";
@@ -147,6 +192,18 @@ export const downloadResumeToTemp = async (url, fileName = "resume.pdf") => {
     UPLOAD_DIR,
     `reanalyze_${Date.now()}_${Math.random().toString(36).slice(2, 8)}${ext}`
   );
+
+  const localPath = localPathForUrl(url);
+  if (localPath) {
+    await fs.promises.copyFile(localPath, destination);
+    return destination;
+  }
+
+  const response = await axios.get(url, {
+    responseType: "arraybuffer",
+    timeout: 60_000,
+    maxContentLength: MAX_SIZE_BYTES,
+  });
 
   await fs.promises.writeFile(destination, Buffer.from(response.data));
   return destination;

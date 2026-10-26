@@ -14,6 +14,8 @@ import type {
   ResumeListResponse,
   ResumeProfileResponse,
   SendMessageResponse,
+  SetupConfigInput,
+  SetupStatus,
   Sharing,
   UploadSummary,
 } from "./types";
@@ -505,3 +507,15 @@ export async function publicChat(
     })
   );
 }
+
+// --- First-run setup (portable / desktop builds) ----------------------------
+
+export const setupApi = {
+  status: () => request<SetupStatus>("/setup/status", {}, false),
+  testMongo: (mongoUri: string) =>
+    request<{ ok: boolean }>("/setup/test-mongo", json({ mongoUri }), false),
+  complete: (input: SetupConfigInput) =>
+    request<SetupStatus>("/setup/config", json(input), false),
+  updateLlm: (input: Omit<SetupConfigInput, "mongoUri">) =>
+    request<SetupStatus>("/setup/llm", json(input), false),
+};

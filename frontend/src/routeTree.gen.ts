@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResumesRouteImport } from './routes/resumes'
 import { Route as RecruiterRouteImport } from './routes/recruiter'
@@ -33,6 +34,11 @@ const UploadRoute = UploadRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/recruiter': typeof RecruiterRoute
   '/resumes': typeof ResumesRoute
   '/settings': typeof SettingsRoute
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/recruiter': typeof RecruiterRoute
   '/resumes': typeof ResumesRoute
   '/settings': typeof SettingsRoute
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/recruiter': typeof RecruiterRoute
   '/resumes': typeof ResumesRoute
   '/settings': typeof SettingsRoute
+  '/setup': typeof SetupRoute
   '/signup': typeof SignupRoute
   '/upload': typeof UploadRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/recruiter'
     | '/resumes'
     | '/settings'
+    | '/setup'
     | '/signup'
     | '/upload'
     | '/reset-password/$token'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/recruiter'
     | '/resumes'
     | '/settings'
+    | '/setup'
     | '/signup'
     | '/upload'
     | '/reset-password/$token'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/recruiter'
     | '/resumes'
     | '/settings'
+    | '/setup'
     | '/signup'
     | '/upload'
     | '/reset-password/$token'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   RecruiterRoute: typeof RecruiterRoute
   ResumesRoute: typeof ResumesRoute
   SettingsRoute: typeof SettingsRoute
+  SetupRoute: typeof SetupRoute
   SignupRoute: typeof SignupRoute
   UploadRoute: typeof UploadRoute
   ResetPasswordTokenRoute: typeof ResetPasswordTokenRoute
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -347,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecruiterRoute: RecruiterRoute,
   ResumesRoute: ResumesRoute,
   SettingsRoute: SettingsRoute,
+  SetupRoute: SetupRoute,
   SignupRoute: SignupRoute,
   UploadRoute: UploadRoute,
   ResetPasswordTokenRoute: ResetPasswordTokenRoute,
